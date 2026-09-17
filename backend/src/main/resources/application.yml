@@ -6,7 +6,7 @@ spring:
     default: local
 
   datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:petcare}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3307}/${DB_NAME:petcare}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: ${DB_USER:petcare}
     password: ${DB_PASSWORD:petcare}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -45,3 +45,7 @@ management:
 logging:
   level:
     com.petcare: INFO
+
+petcare:
+  cors:
+    origenes-permitidos: ${CORS_ORIGENES:http://localhost:5173}

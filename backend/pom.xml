@@ -18,7 +18,7 @@
     <description>Plataforma de reservas y pagos para servicios de mascotas</description>
 
     <properties>
-        <java.version>21</java.version>
+        <java.version>17</java.version>
     </properties>
 
     <dependencies>
