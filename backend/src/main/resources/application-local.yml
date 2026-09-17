@@ -1,0 +1,11 @@
+# Perfil de desarrollo local. Se activa solo si arrancas con
+#   -Dspring.profiles.active=local
+# o si no defines ningun perfil (es el default en application.yml).
+spring:
+  jpa:
+    show-sql: true
+
+logging:
+  level:
+    com.petcare: DEBUG
+    org.hibernate.SQL: DEBUG

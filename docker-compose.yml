@@ -1,0 +1,24 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: petcare-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-petcare}
+      MYSQL_USER: ${DB_USER:-petcare}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-petcare}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+      TZ: UTC
+    command: --default-time-zone='+00:00'
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - petcare-mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-root}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  petcare-mysql-data:

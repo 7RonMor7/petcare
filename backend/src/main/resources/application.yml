@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: petcare-backend
+
+  profiles:
+    default: local
+
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:petcare}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: ${DB_USER:petcare}
+    password: ${DB_PASSWORD:petcare}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    # validate, nunca update: el esquema lo manda Flyway, no Hibernate.
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+        format_sql: true
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  jackson:
+    default-property-inclusion: non_null
+
+server:
+  port: ${SERVER_PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    com.petcare: INFO
