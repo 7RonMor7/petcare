@@ -10,12 +10,13 @@ Proyecto académico de desarrollo de software. Java + Spring Boot en el backend,
 
 | Capa | Tecnologías |
 |---|---|
-| Backend | Java 21 · Spring Boot 3.4 · Spring Web · Spring Data JPA · Bean Validation · Flyway · Maven · Lombok |
+| Backend | Java 17 · Spring Boot 3.4 · Spring Web · Spring Data JPA · Bean Validation · Flyway · Maven · Lombok |
 | Frontend | React 18 · Vite · Tailwind CSS 4 · Axios · React Router |
 | Base de datos | MySQL 8.4 (en Docker) |
 | Herramientas | Git · Docker · IntelliJ IDEA · VS Code |
 
 Spring Security y JWT entran en el Sprint 1, cuando toque el registro y el login. No están todavía: añadir `spring-boot-starter-security` deja todos los endpoints detrás de un login automático, y eso confunde más de lo que ayuda mientras no hay usuarios.
+> En este equipo, MySQL está publicado en el puerto 3307 (el 3306 está ocupado).
 
 ---
 
