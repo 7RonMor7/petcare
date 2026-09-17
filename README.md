@@ -59,6 +59,8 @@ cd backend
 mvn spring-boot:run
 ```
 
+Una línea, "en local MySQL está en 3307"
+
 Arranca en `http://localhost:8080`. La primera vez, Maven descarga dependencias y tarda unos minutos.
 
 Al arrancar, Flyway aplica las migraciones de `db/migration` y deja constancia en la tabla `flyway_schema_history`. En los logs verás algo como `Successfully applied 1 migration`.
