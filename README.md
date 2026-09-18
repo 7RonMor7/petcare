@@ -42,7 +42,7 @@ PetCare/
 
 ## Arrancar el proyecto
 
-Necesitas Java 21, Maven, Node 20+, Docker y Git.
+Necesitas Java 17, Maven, Node 20+, Docker y Git.
 
 ### 1. Base de datos
 
