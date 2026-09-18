@@ -78,7 +78,7 @@ public class Usuario {
         this.creadoEn = ahora;
         this.actualizadoEn = ahora;
     }
-    
+
     @PreUpdate
     void alActualizar(){
         this.actualizadoEn = Instant.now();
