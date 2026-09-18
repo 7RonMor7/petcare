@@ -53,14 +53,14 @@ docker compose ps          # espera a que aparezca "healthy"
 
 Levanta MySQL 8.4 en el puerto 3306 con la base `petcare`, usuario `petcare` y contraseña `petcare`. Los datos persisten en el volumen `petcare-mysql-data`, así que puedes apagar el contenedor sin perderlos.
 
+> En local MySQL está en 3307
+
 ### 2. Backend
 
 ```bash
 cd backend
 mvn spring-boot:run
 ```
-
-Una línea, "en local MySQL está en 3307"
 
 Arranca en `http://localhost:8080`. La primera vez, Maven descarga dependencias y tarda unos minutos.
 
