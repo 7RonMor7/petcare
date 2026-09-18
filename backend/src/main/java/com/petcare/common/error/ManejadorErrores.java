@@ -1,0 +1,48 @@
+package com.petcare.common.error;
+
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.time.Instant;
+import java.util.List;
+
+@RestControllerAdvice
+public class ManejadorErrores {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<RespuestaError> validacionFallida(
+            MethodArgumentNotValidException ex, HttpServletRequest peticion){
+
+        List<RespuestaError.DetalleError> detalles = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(e -> new RespuestaError.DetalleError(e.getField(), e.getDefaultMessage()))
+                .toList();
+
+        return construir(HttpStatus.BAD_REQUEST, "VALIDACION_FALLIDA",
+                "La solicitud contiene campos inválidos", peticion, detalles);
+    }
+
+    @ExceptionHandler(CorreoYaRegistradoException.class)
+    public ResponseEntity<RespuestaError> correoDuplicado(
+            CorreoYaRegistradoException ex, HttpServletRequest peticion){
+
+        return construir(HttpStatus.CONFLICT, "CORREO_YA_REGISTRADO",
+                ex.getMessage(), peticion, null);
+    }
+
+    private ResponseEntity<RespuestaError> construir(
+            HttpStatus estado, String codigo, String mensaje,
+            HttpServletRequest peticion, List<RespuestaError.DetalleError> detalles){
+
+        RespuestaError cuerpo = new RespuestaError(
+                Instant.now(), estado.value(), codigo, mensaje,
+                peticion.getRequestURI(), detalles);
+
+        return ResponseEntity.status(estado).body(cuerpo);
+    }
+}
