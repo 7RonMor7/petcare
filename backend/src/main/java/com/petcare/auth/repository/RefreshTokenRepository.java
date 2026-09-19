@@ -14,5 +14,5 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
 
     @Modifying
     @Query("UPDATE RefreshToken t SET t.revocado = true WHERE t.familiaId = :familiaID")
-    int revocarFamilia(@Param("familiaID") Long familiaID);
+    int revocarFamilia(@Param("familiaID") String familiaID);
 }
