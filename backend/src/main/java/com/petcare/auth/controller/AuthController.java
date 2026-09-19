@@ -1,7 +1,7 @@
 package com.petcare.auth.controller;
 
-import com.petcare.auth.dto.RegistroClienteRequest;
-import com.petcare.auth.dto.UsuarioResponse;
+import com.petcare.auth.dto.*;
+import com.petcare.auth.service.AutenticacionService;
 import com.petcare.auth.service.RegistroService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final RegistroService registroService;
+    private final AutenticacionService autenticacionService;
 
     public AuthController(RegistroService registroService) {
         this.registroService = registroService;
@@ -25,5 +26,15 @@ public class AuthController {
     @ResponseStatus(HttpStatus.CREATED)
     public UsuarioResponse registrar(@Valid @RequestBody RegistroClienteRequest peticion){
         return registroService.registrarCliente(peticion);
+    }
+
+    @PostMapping("/login")
+    public TokenResponse iniciarSesion(@Valid @RequestBody LoginRequest peticion){
+        return autenticacionService.iniciarSesion(peticion);
+    }
+
+    @PostMapping("/refresh")
+    public TokenResponse renovar(@Valid @RequestBody RefreshRequest peticion){
+        return autenticacionService.iniciarSesion(peticion.refreshToken());
     }
 }
