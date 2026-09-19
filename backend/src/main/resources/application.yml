@@ -49,3 +49,7 @@ logging:
 petcare:
   cors:
     origenes-permitidos: ${CORS_ORIGENES:http://localhost:5173}
+  jwt:
+    secreto: ${JWT_SECRETO:clave-de-desarrollo-petcare-cambiar-en-produccion-2026}
+    expiracion-access-minutos: ${JWT_ACCESS_MINUTOS:15}
+    expiracion-refresh-dias: ${JWT_REFRESH_DIAS:7}
