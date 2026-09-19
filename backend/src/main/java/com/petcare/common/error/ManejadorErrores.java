@@ -35,6 +35,22 @@ public class ManejadorErrores {
                 ex.getMessage(), peticion, null);
     }
 
+    @ExceptionHandler(CredencialesInvalidasException.class)
+    public ResponseEntity<RespuestaError> credencialesInvalidas(
+            CredencialesInvalidasException ex, HttpServletRequest peticion){
+
+        return construir(HttpStatus.UNAUTHORIZED, "CREDENCIALES_INVALIDAS",
+                ex.getMessage(), peticion, null);
+    }
+
+    @ExceptionHandler(TokenInvalidoException.class)
+    public ResponseEntity<RespuestaError> tokenInvalido(
+            TokenInvalidoException ex, HttpServletRequest peticion){
+
+        return construir(HttpStatus.UNAUTHORIZED, "TOKEN_INVALIDO",
+                ex.getMessage(), peticion, null);
+    }
+
     private ResponseEntity<RespuestaError> construir(
             HttpStatus estado, String codigo, String mensaje,
             HttpServletRequest peticion, List<RespuestaError.DetalleError> detalles){
