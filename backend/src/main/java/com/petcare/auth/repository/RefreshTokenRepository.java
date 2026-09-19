@@ -13,6 +13,6 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
     Optional<RefreshToken> findByTokenHash(String tokenHash);
 
     @Modifying
-    @Query("UPDATE RefreshToken t SET t.revocado = true WHERE t.familiaId = :familiaID")
+    @Query("UPDATE RefreshToken t SET t.revocado = true WHERE t.familiaId = :familiaId")
     int revocarFamilia(@Param("familiaID") String familiaId);
 }
