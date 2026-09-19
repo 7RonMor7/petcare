@@ -18,8 +18,11 @@ public class AuthController {
     private final RegistroService registroService;
     private final AutenticacionService autenticacionService;
 
-    public AuthController(RegistroService registroService) {
+    public AuthController(RegistroService registroService,
+                          AutenticacionService autenticacionService) {
+
         this.registroService = registroService;
+        this.autenticacionService = autenticacionService;
     }
 
     @PostMapping("/registro")
@@ -35,6 +38,6 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public TokenResponse renovar(@Valid @RequestBody RefreshRequest peticion){
-        return autenticacionService.iniciarSesion(peticion.refreshToken());
+        return autenticacionService.renovar(peticion.refreshToken());
     }
 }
