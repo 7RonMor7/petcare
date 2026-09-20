@@ -46,7 +46,7 @@ public class RefreshTokenService {
         return tokenCrudo;
     }
 
-    @Transactional
+    @Transactional(noRollbackFor = TokenInvalidoException.class)
     public RefreshToken consumir(String tokenCrudo) {
         RefreshToken token = repositorio.findByTokenHash(hashear(tokenCrudo))
                 .orElseThrow(TokenInvalidoException::new);
