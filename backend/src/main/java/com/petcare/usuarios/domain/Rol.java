@@ -1,14 +1,12 @@
 package com.petcare.usuarios.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "rol")
@@ -25,5 +23,13 @@ public class Rol {
 
     @Column(length = 150)
     private String descripcion;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "rol_permiso",
+            joinColumns = @JoinColumn(name = "rol_id"),
+            inverseJoinColumns = @JoinColumn(name = "permiso_id")
+    )
+    private Set<Permiso> permisos = new HashSet<>();
 
 }
