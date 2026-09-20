@@ -5,6 +5,7 @@ import com.petcare.auth.dto.LoginRequest;
 import com.petcare.auth.dto.TokenResponse;
 import com.petcare.auth.dto.UsuarioResponse;
 import com.petcare.common.error.CredencialesInvalidasException;
+import com.petcare.common.error.TokenInvalidoException;
 import com.petcare.usuarios.domain.Rol;
 import com.petcare.usuarios.domain.Usuario;
 import com.petcare.usuarios.repository.UsuarioRepository;
@@ -52,7 +53,7 @@ public class AutenticacionService {
         return construirRespuesta(usuario, UUID.randomUUID().toString());
     }
 
-    @Transactional
+    @Transactional(noRollbackFor = TokenInvalidoException.class)
     public TokenResponse renovar(String refreshTokenCrudo) {
         RefreshToken consumido = refreshTokenService.consumir(refreshTokenCrudo);
         Usuario usuario = consumido.getUsuario();
