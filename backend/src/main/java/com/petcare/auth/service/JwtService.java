@@ -1,5 +1,6 @@
 package com.petcare.auth.service;
 
+import com.petcare.usuarios.domain.Permiso;
 import com.petcare.usuarios.domain.Rol;
 import com.petcare.usuarios.domain.Usuario;
 import io.jsonwebtoken.Claims;
@@ -12,6 +13,7 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -39,11 +41,18 @@ public class JwtService {
                 .map(Rol::getNombre)
                 .toList();
 
+        List<String> permisos = usuario.getRoles().stream()
+                .flatMap(rol -> rol.getPermisos().stream())
+                .map(Permiso::getNombre)
+                .distinct()
+                .toList();
+
         return Jwts.builder()
                 .id(UUID.randomUUID().toString())
                 .subject(usuario.getId().toString())
                 .claim("correo", usuario.getCorreo())
                 .claim("roles", roles)
+                .claim("permisos", permisos)
                 .issuedAt(Date.from(ahora))
                 .expiration(Date.from(expira))
                 .signWith(clave)
