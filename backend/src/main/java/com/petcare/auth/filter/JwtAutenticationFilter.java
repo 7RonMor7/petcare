@@ -18,13 +18,13 @@ import java.io.IOException;
 import java.util.List;
 
 @Component
-public class JwtAutenticacionFilter extends OncePerRequestFilter {
+public class JwtAutenticationFilter extends OncePerRequestFilter {
 
     private static final String PREFIJO = "Bearer ";
 
     private final JwtService jwtService;
 
-    public JwtAutenticacionFilter(JwtService jwtService) {
+    public JwtAutenticationFilter(JwtService jwtService) {
         this.jwtService = jwtService;
     }
 
