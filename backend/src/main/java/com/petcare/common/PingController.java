@@ -1,6 +1,7 @@
 package com.petcare.common;
 
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,5 +45,12 @@ public class PingController {
                 "motor", version,
                 "migracionesAplicadas", migraciones
         );
+    }
+
+    //Endpoint temporal
+    @GetMapping("/admin")
+    @PreAuthorize("hasAuthority('DASHBOARD_LEER')")
+    public Map<String, Object> pingAdmin() {
+        return Map.of("mensaje", "Solo lo ve quien tiene DASHBOARD_LEER");
     }
 }
