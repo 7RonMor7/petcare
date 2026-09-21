@@ -87,4 +87,11 @@ public class RefreshTokenService {
         }
     }
 
+    @Transactional
+    public void cerrarSesion(String tokenCrudo, Long usuarioId){
+        repositorio.findByTokenHash(hashear(tokenCrudo))
+                .filter(token -> token.getUsuario().getId().equals(usuarioId))
+                .ifPresent(token -> repositorio.revocarFamilia(token.getFamiliaId()));
+    }
+
 }
