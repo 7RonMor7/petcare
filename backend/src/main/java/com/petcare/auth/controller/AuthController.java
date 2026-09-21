@@ -42,6 +42,15 @@ public class AuthController {
         return autenticacionService.renovar(peticion.refreshToken());
     }
 
+    @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void cerrarSesion(@Valid @RequestBody RefreshRequest peticion,
+                             Authentication autenticacion) {
+
+        Long usuarioId = (Long) autenticacion.getPrincipal();
+        autenticacionService.cerrarSesion(peticion.refreshToken(), usuarioId);
+    }
+
     @GetMapping("/yo")
     public Map<String, Object> yo(Authentication autenticacion) {
         return Map.of(
