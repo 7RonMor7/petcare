@@ -48,7 +48,7 @@ public class PingController {
     }
 
     //Endpoint temporal
-    @GetMapping("/admin")
+    @GetMapping("/ping/admin")
     @PreAuthorize("hasAuthority('DASHBOARD_LEER')")
     public Map<String, Object> pingAdmin() {
         return Map.of("mensaje", "Solo lo ve quien tiene DASHBOARD_LEER");
