@@ -52,6 +52,9 @@ public class Mascota {
     @Column(length = 500)
     private String observaciones;
 
+    @Column(nullable = false)
+    private boolean activo = true;
+
     @Column(name = "creado_en", nullable = false, updatable = false)
     private Instant creadoEn;
 
