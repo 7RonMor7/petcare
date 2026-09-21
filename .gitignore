@@ -9,6 +9,7 @@ target/
 backend/registro.json
 backend/login.json
 backend/refresh.json
+backend/mascota.json
 
 # --- Node ---
 node_modules/
