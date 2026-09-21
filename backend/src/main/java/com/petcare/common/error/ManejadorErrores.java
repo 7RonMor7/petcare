@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 
 import java.time.Instant;
 import java.util.List;
@@ -49,6 +50,14 @@ public class ManejadorErrores {
 
         return construir(HttpStatus.UNAUTHORIZED, "TOKEN_INVALIDO",
                 ex.getMessage(), peticion, null);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<RespuestaError> cuerpoInvalido(
+            HttpMessageNotReadableException ex, HttpServletRequest peticion){
+
+        return construir(HttpStatus.BAD_REQUEST, "CUERPO_INVALIDO",
+                "El cuerpo de la petición no es válido o tiene valores no permitidos", peticion, null);
     }
 
     private ResponseEntity<RespuestaError> construir(
