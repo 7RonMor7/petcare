@@ -11,3 +11,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </BrowserRouter>
   </React.StrictMode>
 )
+
+import * as api from './api/cliente';
+if (import.meta.env.DEV) window.petcare = api;
