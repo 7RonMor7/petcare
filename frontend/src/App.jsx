@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useAuth } from './auth/AuthContext'
 import cliente from './api/cliente'
 
 /**
@@ -24,6 +25,7 @@ export default function App() {
 
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-10">
+      <PanelSesion />
       <div className="mx-auto w-full max-w-xl">
         <h1 className="text-2xl font-semibold text-slate-900">PetCare</h1>
         <p className="mt-1 text-sm text-slate-500">
@@ -66,4 +68,18 @@ function Tarjeta({ titulo, resultado }) {
       )}
     </div>
   )
+}
+
+// Panel temporal (Se quiota al hacer el login real)
+function PanelSesion() {
+  const { usuario, cargando, iniciarSesion, cerrarSesion, tienePermiso } = useAuth();
+  if (cargando) return <p className="p-4">Comprobando sesión…</p>;
+  return (
+    <div className="p-4 border m-4 space-y-2">
+      <p>Usuario: {usuario ? usuario.correo : 'ninguno'}</p>
+      <p>Permisos: {usuario?.permisos?.length ?? 0} · MASCOTA_CREAR: {String(tienePermiso('MASCOTA_CREAR'))}</p>
+      <button className="border px-3 mr-2" onClick={() => iniciarSesion('ana@ejemplo.com', 'Segura123')}>Login</button>
+      <button className="border px-3" onClick={cerrarSesion}>Logout</button>
+    </div>
+  );
 }
