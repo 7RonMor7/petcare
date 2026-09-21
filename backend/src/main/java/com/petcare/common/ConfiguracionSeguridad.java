@@ -45,7 +45,8 @@ public class ConfiguracionSeguridad {
                                 "/api/v1/auth/refresh",
                                 "/api/v1/ping",
                                 "/api/v1/ping/db",
-                                "/actuator/health"
+                                "/actuator/health",
+                                "/error"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
