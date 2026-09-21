@@ -5,11 +5,12 @@ import com.petcare.auth.service.AutenticacionService;
 import com.petcare.auth.service.RegistroService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -39,5 +40,14 @@ public class AuthController {
     @PostMapping("/refresh")
     public TokenResponse renovar(@Valid @RequestBody RefreshRequest peticion){
         return autenticacionService.renovar(peticion.refreshToken());
+    }
+
+    @GetMapping("/yo")
+    public Map<String, Object> yo(Authentication autenticacion) {
+        return Map.of(
+                "usuarioId", autenticacion.getPrincipal(),
+                "permisos", autenticacion.getAuthorities()
+                        .stream().map(GrantedAuthority::getAuthority).sorted().toList()
+        );
     }
 }
