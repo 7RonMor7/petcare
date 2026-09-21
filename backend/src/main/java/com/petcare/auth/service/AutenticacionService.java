@@ -75,4 +75,8 @@ public class AutenticacionService {
 
         return new TokenResponse(accessToken, refreshToken, jwtService.segundosDeVida(), datos);
     }
+
+    public void cerrarSesion(String refreshToken, Long usuarioId) {
+        refreshTokenService.cerrarSesion(refreshToken, usuarioId);
+    }
 }
