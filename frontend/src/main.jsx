@@ -4,7 +4,6 @@ import { BrowserRouter } from 'react-router-dom'
 import { AuthProvider } from './auth/AuthContext'
 import App from './App.jsx'
 import './index.css'
-import * as api from './api/cliente'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -16,4 +15,3 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   </React.StrictMode>
 )
 
-if (import.meta.env.DEV) window.petcare = api;
