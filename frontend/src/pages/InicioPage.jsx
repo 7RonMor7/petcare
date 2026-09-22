@@ -1,28 +1,29 @@
-import { Link } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 
-// Pagina de inicio TEMPORAL. En el paso 5 se protege con RutaProtegida
-// y gana la barra superior con el boton de cerrar sesion.
 export default function InicioPage() {
-  const { usuario, cargando, cerrarSesion } = useAuth();
-
-  if (cargando) return <p className="p-6 text-neutral-600">Comprobando sesión…</p>;
+  const { usuario } = useAuth();
 
   return (
-    <main className="mx-auto max-w-xl px-4 py-10">
-      {usuario ? (
-        <>
-          <h1 className="text-2xl font-extrabold">Hola, {usuario.nombre}</h1>
-          <p className="mt-1 text-neutral-600">{usuario.correo} · {usuario.roles.join(', ')}</p>
-          <button onClick={cerrarSesion} className="mt-6 rounded-md border border-neutral-900 px-4 py-2 font-semibold">
-            Cerrar sesión
-          </button>
-        </>
-      ) : (
-        <p>
-          No has iniciado sesión. <Link to="/login" className="font-medium underline">Inicia sesión</Link>
-        </p>
-      )}
-    </main>
+    <div>
+      <h1 className="text-2xl font-extrabold tracking-tight text-neutral-900">
+        Hola, {usuario.nombre}
+      </h1>
+      <p className="mt-1 text-neutral-600">
+        {usuario.correo} · {usuario.roles.join(', ')}
+      </p>
+
+      <section className="mt-8 rounded-lg border border-neutral-200 bg-white p-4">
+        <h2 className="text-sm font-semibold text-neutral-900">
+          Permisos de tu sesión ({usuario.permisos.length})
+        </h2>
+        <ul className="mt-3 flex flex-wrap gap-2">
+          {usuario.permisos.map((p) => (
+            <li key={p} className="rounded-full bg-neutral-100 px-3 py-1 text-xs text-neutral-700">
+              {p}
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
   );
 }
