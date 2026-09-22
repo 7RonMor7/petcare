@@ -83,4 +83,19 @@ public class Mascota {
     void alActualizar() {
         actualizadoEn = Instant.now();
     }
+
+    public void actualizarDatos(String nombre, Especie especie, String raza, Sexo sexo,
+                                LocalDate fechaNacimiento, BigDecimal pesoKg, String observaciones) {
+        this.nombre = nombre;
+        this.especie = especie;
+        this.raza = raza;
+        this.sexo = sexo;
+        this.fechaNacimiento = fechaNacimiento;
+        this.pesoKg = pesoKg;
+        this.observaciones = observaciones;
+    }
+
+    public void desactivar() {
+        this.activo = false;
+    }
 }
