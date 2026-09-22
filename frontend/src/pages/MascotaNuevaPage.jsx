@@ -19,7 +19,7 @@ const ESPECIES = [
     { valor: 'OTRO', texto: 'Otro' },
 ];
 
-const SEXO = [
+const SEXOS = [
     { valor: 'MACHO', texto: 'Macho' },
     { valor: 'HEMBRA', texto: 'Hembra' },
 ];
