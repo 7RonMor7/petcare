@@ -43,19 +43,19 @@ export default function LoginPage() {
     }
 
     return (
-        <DisenoAuth
-            titulo="Inicia sesión"
-            subtitulo={<>¿No tienes cuenta? <Link to="/registro" className="font-medium underline">Regístrate</Link></>}
-        >
-            <Alerta>{errorGeneral}</Alerta>
+      <DisenoAuth
+        titulo="Inicia sesión"
+        subtitulo={<>¿No tienes cuenta? <Link to="/registro" className="font-medium underline">Regístrate</Link></>}
+      >
+        <Alerta>{errorGeneral}</Alerta>
 
-            <form onSubmit={enviar} noValidate className="space-y-5">
-                <CampoTexto etiqueta="Correo" name="correo" tipo="email" autoComplete="email"
-                    value={form.correo} onChange={cambiar} error={errores.correo} />
-                <CampoTexto etiqueta="Contraseña" name="contrasena" tipo="password" autoComplete="current-password"
-                    value={form.contrasena} onChange={cambiar} error={errores.contrasena} />
-                <Boton cargando={enviando}>Iniciar sesión</Boton>
-            </form>
-        </DisenoAuth>
+        <form onSubmit={enviar} noValidate className="space-y-5">
+          <CampoTexto etiqueta="Correo" name="correo" tipo="email" autoComplete="email"
+            value={form.correo} onChange={cambiar} error={errores.correo} />
+          <CampoTexto etiqueta="Contraseña" name="contrasena" tipo="password" autoComplete="current-password"
+            value={form.contrasena} onChange={cambiar} error={errores.contrasena} />
+          <Boton cargando={enviando}>Iniciar sesión</Boton>
+        </form>
+      </DisenoAuth>
     );
 }
