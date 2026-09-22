@@ -46,7 +46,7 @@ public class MascotaService {
     }
 
     @Transactional
-    public MascotaResponse actualizar(Long id, MascotaResponse datos, Long clienteId) {
+    public MascotaResponse actualizar(Long id, MascotaRequest datos, Long clienteId) {
         Mascota mascota = buscarPropia(id, clienteId);
         mascota.actualizarDatos(datos.nombre().trim(), datos.especie(), datos.raza(),
                 datos.sexo(), datos.fechaNacimiento(), datos.pesoKg(), datos.observaciones());
