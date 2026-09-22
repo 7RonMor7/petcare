@@ -60,6 +60,14 @@ public class ManejadorErrores {
                 "El cuerpo de la petición no es válido o tiene valores no permitidos", peticion, null);
     }
 
+    @ExceptionHandler(RecursoNoEncontradoException.class)
+    public ResponseEntity<RespuestaError> noEncontrado(
+            RecursoNoEncontradoException ex, HttpServletRequest peticion) {
+
+        return construir(HttpStatus.NOT_FOUND, "RECURSO_NO_ENCONTRADO",
+                ex.getMessage(), peticion, null);
+    }
+
     private ResponseEntity<RespuestaError> construir(
             HttpStatus estado, String codigo, String mensaje,
             HttpServletRequest peticion, List<RespuestaError.DetalleError> detalles){
