@@ -4,6 +4,7 @@ import com.petcare.auth.domain.RefreshToken;
 import com.petcare.auth.dto.LoginRequest;
 import com.petcare.auth.dto.TokenResponse;
 import com.petcare.auth.dto.UsuarioResponse;
+import com.petcare.auth.dto.YoResponse;
 import com.petcare.common.error.CredencialesInvalidasException;
 import com.petcare.common.error.TokenInvalidoException;
 import com.petcare.usuarios.domain.Rol;
@@ -13,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import  java.util.stream.Collectors;
@@ -59,6 +61,19 @@ public class AutenticacionService {
         Usuario usuario = consumido.getUsuario();
 
         return construirRespuesta(usuario, consumido.getFamiliaId());
+    }
+
+    @Transactional(readOnly = true)
+    public YoResponse yo(Long usuarioId, List<String> permisos) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new TokenInvalidoException());
+
+        List<String> roles = usuario.getRoles().stream()
+                .map(Rol::getNombre)
+                .sorted()
+                .toList();
+
+        return new YoResponse(usuario.getId(), usuario.getCorreo(), usuario.getNombre(), usuario.getApellido(), roles, permisos);
     }
 
     private TokenResponse construirRespuesta(Usuario usuario, String familiaId){
