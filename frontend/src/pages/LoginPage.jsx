@@ -15,7 +15,7 @@ export default function LoginPage() {
     const [form, setForm] = useState({ correo: '', contrasena: '' });
     const [errores, setErrores] = useState({});
     const [errorGeneral, setErrorGeneral] = useState('');
-    const [enviado, setEnviado] = useState(false);
+    const [enviando, setEnviado] = useState(false);
 
     if (cargando) return null;
     if (estaAutenticado) return <Navigate to={destino} replace />;
