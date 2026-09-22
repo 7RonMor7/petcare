@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -52,11 +53,12 @@ public class AuthController {
     }
 
     @GetMapping("/yo")
-    public Map<String, Object> yo(Authentication autenticacion) {
-        return Map.of(
-                "usuarioId", autenticacion.getPrincipal(),
-                "permisos", autenticacion.getAuthorities()
-                        .stream().map(GrantedAuthority::getAuthority).sorted().toList()
-        );
+    public YoResponse yo(Authentication autenticacion) {
+        Long usuarioId = (Long) autenticacion.getPrincipal();
+        List<String> permisos = autenticacion.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .sorted()
+                .toList();
+        return autenticacionService.yo(usuarioId, permisos);
     }
 }
