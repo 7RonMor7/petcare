@@ -48,7 +48,7 @@ public class MascotaController {
         return mascotaService.actualizar(id, datos, (Long) autenticacion.getPrincipal());
     }
 
-    @DeleteMapping
+    @DeleteMapping({"/{id}"})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('MASCOTA_ELIMINAR_PROPIA')")
     public void eliminar(@PathVariable Long id, Authentication autenticacion) {
