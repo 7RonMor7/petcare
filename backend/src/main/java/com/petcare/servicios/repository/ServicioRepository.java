@@ -11,4 +11,8 @@ public interface ServicioRepository extends JpaRepository<Servicio, Long> {
     List<Servicio> findByActivoTrueOrderByNombreAsc();
 
     Optional<Servicio> findByIdAndActivoTrue(Long id);
+
+    boolean existsByNombreIgnoreCase(String nombre);
+
+    boolean existsByNombreIgnoreCaseAndIdNot(String nombre, Long id);
 }
