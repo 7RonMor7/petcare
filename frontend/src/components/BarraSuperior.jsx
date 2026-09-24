@@ -7,6 +7,8 @@ import { useAuth } from '../auth/AuthContext';
 const ENLACES = [
   { a: '/', texto: 'Inicio', permiso: null },
   { a: '/mascotas', texto: 'Mis mascotas', permiso: 'MASCOTA_LEER_PROPIA' },
+  { a: '/servicios', texto: 'Servicios', permiso: null },
+  { a: '/admin/servicios', texto: 'Gestión de servicios', permiso: 'SERVICIO_GESTIONAR' },
 ];
 
 export default function BarraSuperior() {
