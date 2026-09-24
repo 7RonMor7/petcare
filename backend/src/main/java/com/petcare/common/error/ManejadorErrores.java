@@ -68,6 +68,14 @@ public class ManejadorErrores {
                 ex.getMessage(), peticion, null);
     }
 
+    @ExceptionHandler(ServicioYaExisteException.class)
+    public ResponseEntity<RespuestaError> servicioDuplicado(
+            ServicioYaExisteException ex, HttpServletRequest peticion){
+
+        return construir(HttpStatus.CONFLICT, "SERVICIO_YA_EXISTE",
+                ex.getMessage(), peticion, null);
+    }
+
     private ResponseEntity<RespuestaError> construir(
             HttpStatus estado, String codigo, String mensaje,
             HttpServletRequest peticion, List<RespuestaError.DetalleError> detalles){
