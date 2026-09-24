@@ -6,7 +6,7 @@ import { useAuth } from '../auth/AuthContext';
 
 const ENLACES = [
   { a: '/', texto: 'Inicio', permiso: null },
-  { a: '/mascotas/nueva', texto: 'Registrar mascota', permiso: 'MASCOTA_CREAR' },
+  { a: '/mascotas', texto: 'Mis mascotas', permiso: 'MASCOTA_LEER_PROPIA' },
 ];
 
 export default function BarraSuperior() {
