@@ -51,4 +51,24 @@ public class Servicio {
 
     @PreUpdate
     void alActualizar() { actualizadoEn = Instant.now(); }
+
+    public Servicio(String nombre, String descripcion, BigDecimal precio,
+                    UnidadCobro  unidadCobro, Integer duracionMinutos) {
+        this.nombre = nombre;
+        this.descripcion = descripcion;
+        this.precio = precio;
+        this.unidadCobro = unidadCobro;
+        this.duracionMinutos = duracionMinutos;
+    }
+
+    public void actualizarDatos(String nombre, String descripcion, BigDecimal precio,
+                                UnidadCobro unidadCobro, Integer duracionMinutos) {
+        this.nombre = nombre;
+        this.descripcion = descripcion;
+        this.precio = precio;
+        this.unidadCobro = unidadCobro;
+        this.duracionMinutos = duracionMinutos;
+    }
+
+    public void cambiarEstado(boolean activo) { this.activo = activo; }
 }
