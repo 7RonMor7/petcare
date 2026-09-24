@@ -39,17 +39,24 @@ public class ConfiguracionSeguridad {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(rutas -> rutas
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers( HttpMethod.GET,
+
+                        // Públicas con cualquier método (el login y el registro son POST)
+                        .requestMatchers(
                                 "/api/v1/auth/registro",
                                 "/api/v1/auth/login",
                                 "/api/v1/auth/refresh",
-                                "/api/v1/servicios",
-                                "api/v1/servicios/*",
                                 "/api/v1/ping",
                                 "/api/v1/ping/db",
                                 "/actuator/health",
                                 "/error"
                         ).permitAll()
+
+                        // Catálogo: solo lectura pública. El POST, PUT y PATCH exigen permiso.
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/v1/servicios",
+                                "api/v1/servicios/*"
+                        ).permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(e -> e
