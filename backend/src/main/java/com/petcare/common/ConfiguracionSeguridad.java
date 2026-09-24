@@ -39,10 +39,12 @@ public class ConfiguracionSeguridad {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(rutas -> rutas
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers(
+                        .requestMatchers( HttpMethod.GET,
                                 "/api/v1/auth/registro",
                                 "/api/v1/auth/login",
                                 "/api/v1/auth/refresh",
+                                "/api/v1/servicios",
+                                "api/v1/servicios/*",
                                 "/api/v1/ping",
                                 "/api/v1/ping/db",
                                 "/actuator/health",
