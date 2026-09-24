@@ -7,6 +7,9 @@ import InicioPage from "./pages/InicioPage";
 import MascotaNuevaPage from "./pages/MascotaNuevaPage";
 import MascotasPage from "./pages/MascotasPage";
 import MascotaEditarPage from "./pages/MascotaEditarPage";
+import CatalogoPage from "./pages/CatalogoPage";
+import ServiciosAdminPage from "./pages/ServiciosAdminPage";
+import ServicioFormPage from "./pages/ServicioFormPage";
 
 export default function App() {
   return (
@@ -14,6 +17,7 @@ export default function App() {
       {/* Públicas  */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/registro" element={<RegistroPage />} />
+      <Route path="/servicios" element={<CatalogoPage />} />
 
       {/* Privadas: primero el guardián, después el marco con la barra */}
       <Route element={<RutaProtegida />}>
@@ -27,6 +31,11 @@ export default function App() {
           </Route>
           <Route element={<RutaProtegida permiso="MASCOTA_EDITAR_PROPIA" />}>
             <Route path="/mascotas/:id/editar" element={<MascotaEditarPage />} />
+          </Route>
+          <Route element={<RutaProtegida permiso="SERVICIO_GESTIONAR" />}>
+            <Route path="/admin/servicios" element={<ServiciosAdminPage />} />
+            <Route path="/admin/servicios/nuevo" element={<ServicioFormPage />} />
+            <Route path="/admin/servicios/:id/editar" element={<ServicioFormPage />} />
           </Route>
         </Route>
       </Route>
