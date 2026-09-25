@@ -1,4 +1,4 @@
-package com.petcare.servicios.dto;
+package com.petcare.common.dto;
 
 import jakarta.validation.constraints.NotNull;
 
