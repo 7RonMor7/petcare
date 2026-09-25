@@ -1,6 +1,6 @@
 package com.petcare.servicios.controller;
 
-import com.petcare.servicios.dto.EstadoRequest;
+import com.petcare.common.dto.EstadoRequest;
 import com.petcare.servicios.dto.ServicioAdminResponse;
 import com.petcare.servicios.dto.ServicioRequest;
 import com.petcare.servicios.dto.ServicioResponse;
