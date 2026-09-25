@@ -125,6 +125,12 @@ Los tres roles son CLIENTE, EMPLEADO y ADMINISTRADOR. `POST /auth/registro` siem
 | GET | `/api/v1/mascotas/{id}` | `MASCOTA_LEER_PROPIA` | HU-017 |
 | PUT | `/api/v1/mascotas/{id}` | `MASCOTA_EDITAR_PROPIA` | HU-017 |
 | DELETE | `/api/v1/mascotas/{id}` | `MASCOTA_ELIMINAR_PROPIA` | HU-017 |
+| GET | `/api/v1/servicios` | público | HU-028 |
+| GET | `/api/v1/servicios/{id}` | público | HU-028 |
+| GET | `/api/v1/servicios/gestion` | `SERVICIO_GESTIONAR` | HU-027 |
+| POST | `/api/v1/servicios` | `SERVICIO_GESTIONAR` | HU-027 |
+| PUT | `/api/v1/servicios/{id}` | `SERVICIO_GESTIONAR` | HU-027 |
+| PATCH | `/api/v1/servicios/{id}/estado` | `SERVICIO_GESTIONAR` | HU-029 |
 
 Todos los errores usan el mismo formato:
 
@@ -141,7 +147,7 @@ Todos los errores usan el mismo formato:
 
 Códigos en uso: `VALIDACION_FALLIDA`, `CUERPO_INVALIDO`, `CORREO_YA_REGISTRADO`,
 `CREDENCIALES_INVALIDAS`, `TOKEN_INVALIDO`, `NO_AUTENTICADO`, `ACCESO_DENEGADO`,
-`RECURSO_NO_ENCONTRADO`.
+`RECURSO_NO_ENCONTRADO`, `SERVICIO_YA_EXISTE`.
 
 **404 y no 403 en los recursos ajenos:** si una mascota no es tuya, la respuesta es la misma que si
 no existiera. Un 403 confirmaría que ese id existe.
@@ -155,7 +161,7 @@ curl http://localhost:8080/api/v1/ping
 # {"servicio":"petcare-backend","estado":"arriba","marcaTiempo":"..."}
 
 curl http://localhost:8080/api/v1/ping/db
-# {"conexion":"ok","motor":"8.4.x","migracionesAplicadas":6}
+# {"conexion":"ok","motor":"8.4.x","migracionesAplicadas":7}
 
 curl http://localhost:8080/actuator/health
 # {"status":"UP", ...}
@@ -187,7 +193,11 @@ mvn package -DskipTests  # si no quieres levantar la base de datos
 
 **Propiedad de los datos.** El dueño de un recurso sale siempre del token, nunca del cuerpo de la petición, y las consultas filtran por él (`findByIdAndClienteId...`) en lugar de comprobarlo con un `if`.
 
-**Borrado.** Lógico: `activo = false`. Una mascota con reservas y pagos no se elimina de la base.
+**Borrado.** Lógico: `activo = false`, tanto en mascotas como en servicios. Nada que pueda estar
+referenciado por una reserva o un pago se borra de la base.
+
+**Precios.** Siempre `DECIMAL` y `BigDecimal`, nunca `double`. El total de una reserva se calculará
+con la `unidadCobro` del servicio y se congelará al crearla: cambiar el catálogo no altera lo vendido.
 
 **Fechas.** Todo se guarda en UTC. La conversión a `America/Bogota` ocurre solo al mostrar.
 
@@ -202,10 +212,14 @@ mvn package -DskipTests  # si no quieres levantar la base de datos
 | Sprint | Contenido | Estado |
 |---|---|:--:|
 | 0 | Entorno, estructura y repositorio | Completado |
-| 1 | Registro, login, autorización, logout, mascotas | En curso |
+| 1 | Registro, login, autorización, logout, mascotas | Completado |
+| 2 | Gestión de mascotas y catálogo de servicios | En curso |
 
 Historias cerradas: **HU-007** (registro), **HU-008** (login con JWT), **HU-009** (autorización por
 permisos), **HU-010** (logout con revocación), **HU-016** (registrar mascota), **HU-017** (listar,
-editar y eliminar mascotas propias).
+editar y eliminar mascotas propias), **HU-018** (interfaz de gestión de mascotas), **HU-027** y
+**HU-029** (crear, editar y desactivar servicios), **HU-028** (catálogo público con precios).
+
+Pendiente del Sprint 2: **HU-021** (servicios por empleado), que espera a que existan empleados.
 
 El análisis, el backlog y las guías de cada historia están en `docs/`.
