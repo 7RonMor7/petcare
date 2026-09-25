@@ -76,6 +76,14 @@ public class ManejadorErrores {
                 ex.getMessage(), peticion, null);
     }
 
+    @ExceptionHandler(ReglaNegocioException.class)
+    public ResponseEntity<RespuestaError> reglaNegocio(
+            ReglaNegocioException ex, HttpServletRequest peticion) {
+
+        return construir(HttpStatus.UNPROCESSABLE_ENTITY, ex.getCodigo(),
+                ex.getMessage(), peticion, null);
+    }
+
     private ResponseEntity<RespuestaError> construir(
             HttpStatus estado, String codigo, String mensaje,
             HttpServletRequest peticion, List<RespuestaError.DetalleError> detalles){
