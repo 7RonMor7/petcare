@@ -84,4 +84,14 @@ public class Usuario {
         this.actualizadoEn = Instant.now();
     }
 
+    public void actualizarDatos(String nombre, String apellido, String telefono) {
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.telefono = telefono;
+    }
+
+    public void cambiarEstado(boolean activo) {
+        this.activo = activo;
+    }
+
 }
