@@ -10,6 +10,9 @@ import MascotaEditarPage from "./pages/MascotaEditarPage";
 import CatalogoPage from "./pages/CatalogoPage";
 import ServiciosAdminPage from "./pages/ServiciosAdminPage";
 import ServicioFormPage from "./pages/ServicioFormPage";
+import EmpleadosAdminPage from "./pages/EmpleadosAdminPage";
+import EmpleadoFormPage from "./pages/EmpleadoFormPage";
+import EmpleadoDetallePage from "./pages/EmpleadoDetallePage";
 
 export default function App() {
   return (
@@ -36,6 +39,12 @@ export default function App() {
             <Route path="/admin/servicios" element={<ServiciosAdminPage />} />
             <Route path="/admin/servicios/nuevo" element={<ServicioFormPage />} />
             <Route path="/admin/servicios/:id/editar" element={<ServicioFormPage />} />
+          </Route>
+          <Route element={<RutaProtegida permiso="EMPLEADO_GESTIONAR" />}>
+            <Route path="/admin/empleados" element={<EmpleadosAdminPage />} />
+            <Route path="/admin/empleados/nuevo" element={<EmpleadoFormPage />} />
+            <Route path="/admin/empleados/:id" element={<EmpleadoDetallePage />} />
+            <Route path="/admin/empleados/:id/editar" element={<EmpleadoFormPage />} />
           </Route>
         </Route>
       </Route>
