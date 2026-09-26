@@ -27,6 +27,8 @@ PetCare/
 │       │   ├── auth/         registro, login, refresco, logout, filtro JWT
 │       │   ├── usuarios/     Usuario, Rol, Permiso
 │       │   ├── mascotas/     HU-016 y HU-017
+│       │   ├── servicios/    HU-027, HU-028 y HU-029
+│       │   ├── agenda/       jornada laboral y servicios por empleado
 │       │   └── common/       CORS, seguridad y manejo de errores
 │       └── resources/
 │           ├── application.yml
@@ -131,6 +133,12 @@ Los tres roles son CLIENTE, EMPLEADO y ADMINISTRADOR. `POST /auth/registro` siem
 | POST | `/api/v1/servicios` | `SERVICIO_GESTIONAR` | HU-027 |
 | PUT | `/api/v1/servicios/{id}` | `SERVICIO_GESTIONAR` | HU-027 |
 | PATCH | `/api/v1/servicios/{id}/estado` | `SERVICIO_GESTIONAR` | HU-029 |
+| GET | `/api/v1/empleados` | `EMPLEADO_GESTIONAR` | HU-020 |
+| POST | `/api/v1/empleados` | `EMPLEADO_GESTIONAR` | HU-020 |
+| PUT | `/api/v1/empleados/{id}` | `EMPLEADO_GESTIONAR` | HU-020 |
+| PATCH | `/api/v1/empleados/{id}/estado` | `EMPLEADO_GESTIONAR` | HU-020 |
+| GET/PUT | `/api/v1/empleados/{id}/jornada` | `EMPLEADO_GESTIONAR` | HU-022 |
+| GET/PUT | `/api/v1/empleados/{id}/servicios` | `EMPLEADO_GESTIONAR` | HU-021 |
 
 Todos los errores usan el mismo formato:
 
@@ -147,7 +155,12 @@ Todos los errores usan el mismo formato:
 
 Códigos en uso: `VALIDACION_FALLIDA`, `CUERPO_INVALIDO`, `CORREO_YA_REGISTRADO`,
 `CREDENCIALES_INVALIDAS`, `TOKEN_INVALIDO`, `NO_AUTENTICADO`, `ACCESO_DENEGADO`,
-`RECURSO_NO_ENCONTRADO`, `SERVICIO_YA_EXISTE`.
+`RECURSO_NO_ENCONTRADO`, `SERVICIO_YA_EXISTE`, `JORNADA_INVALIDA`, `JORNADA_SOLAPADA`,
+`JORNADA_DESALINEADA`, `JORNADA_FUERA_DE_HORARIO`, `SERVICIO_INACTIVO`.
+
+**400 frente a 422.** El `400` significa "no entiendo la petición": falta un campo, o su valor no
+es del tipo esperado. El `422` significa "la entiendo y cada campo es válido, pero la combinación
+rompe una regla del negocio": dos tramos de jornada que se solapan, por ejemplo.
 
 **404 y no 403 en los recursos ajenos:** si una mascota no es tuya, la respuesta es la misma que si
 no existiera. Un 403 confirmaría que ese id existe.
@@ -161,7 +174,7 @@ curl http://localhost:8080/api/v1/ping
 # {"servicio":"petcare-backend","estado":"arriba","marcaTiempo":"..."}
 
 curl http://localhost:8080/api/v1/ping/db
-# {"conexion":"ok","motor":"8.4.x","migracionesAplicadas":7}
+# {"conexion":"ok","motor":"8.4.x","migracionesAplicadas":9}
 
 curl http://localhost:8080/actuator/health
 # {"status":"UP", ...}
@@ -196,6 +209,10 @@ mvn package -DskipTests  # si no quieres levantar la base de datos
 **Borrado.** Lógico: `activo = false`, tanto en mascotas como en servicios. Nada que pueda estar
 referenciado por una reserva o un pago se borra de la base.
 
+**Parámetros del negocio.** Lo que el cliente puede querer cambiar (tamaño de la franja, horario de
+apertura, minutos de expiración de un pago) vive en `parametro_sistema` y se lee con
+`ParametroService`, nunca como constante en el código.
+
 **Precios.** Siempre `DECIMAL` y `BigDecimal`, nunca `double`. El total de una reserva se calculará
 con la `unidadCobro` del servicio y se congelará al crearla: cambiar el catálogo no altera lo vendido.
 
@@ -213,13 +230,16 @@ con la `unidadCobro` del servicio y se congelará al crearla: cambiar el catálo
 |---|---|:--:|
 | 0 | Entorno, estructura y repositorio | Completado |
 | 1 | Registro, login, autorización, logout, mascotas | Completado |
-| 2 | Gestión de mascotas y catálogo de servicios | En curso |
+| 2 | Gestión de mascotas y catálogo de servicios | Completado |
+| 3 | Empleados, jornada laboral y servicios por empleado | Completado |
+| 4 | Motor de disponibilidad | En curso |
 
 Historias cerradas: **HU-007** (registro), **HU-008** (login con JWT), **HU-009** (autorización por
 permisos), **HU-010** (logout con revocación), **HU-016** (registrar mascota), **HU-017** (listar,
 editar y eliminar mascotas propias), **HU-018** (interfaz de gestión de mascotas), **HU-027** y
 **HU-029** (crear, editar y desactivar servicios), **HU-028** (catálogo público con precios).
 
-Pendiente del Sprint 2: **HU-021** (servicios por empleado), que espera a que existan empleados.
+Sprint 3: **HU-020** (empleados), **HU-022** (jornada laboral semanal) y **HU-021** (servicios que
+presta cada empleado) — los tres insumos del motor de disponibilidad.
 
 El análisis, el backlog y las guías de cada historia están en `docs/`.
