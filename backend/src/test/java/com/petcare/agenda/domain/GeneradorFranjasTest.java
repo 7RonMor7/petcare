@@ -24,7 +24,7 @@ class GeneradorFranjasTest {
         assertEquals(7, franjas.size());
         assertEquals(LocalTime.parse("08:00"), franjas.get(0).inicio());
         assertEquals(LocalTime.parse("11:00"), franjas.get(6).inicio());
-        assertEquals(LocalTime.parse("12:00"), franjas.get(0).fin());
+        assertEquals(LocalTime.parse("12:00"), franjas.get(6).fin());
     }
 
     @Test
@@ -33,7 +33,7 @@ class GeneradorFranjasTest {
         List<Franja> franjas = GeneradorFranjas.generar(List.of(tramo("08:00", "12:00")), 45, FRANJA);
 
         assertEquals(7, franjas.size());
-        assertEquals(30, java.time.Duration.between(
+        assertEquals(60, java.time.Duration.between(
                 franjas.get(0).inicio(), franjas.get(0).fin()).toMinutes());
         assertTrue(franjas.stream().noneMatch(f -> f.inicio().equals(LocalTime.parse("11:30"))));
     }
