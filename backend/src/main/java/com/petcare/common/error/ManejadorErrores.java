@@ -84,6 +84,13 @@ public class ManejadorErrores {
                 ex.getMessage(), peticion, null);
     }
 
+    @ExceptionHandler(ConflictoException.class)
+    public ResponseEntity<RespuestaError> conflicto(
+            ConflictoException ex, HttpServletRequest peticion) {
+
+        return construir(HttpStatus.CONFLICT, ex.getCodigo(), ex.getMessage(), peticion, null);
+    }
+
     private ResponseEntity<RespuestaError> construir(
             HttpStatus estado, String codigo, String mensaje,
             HttpServletRequest peticion, List<RespuestaError.DetalleError> detalles){
