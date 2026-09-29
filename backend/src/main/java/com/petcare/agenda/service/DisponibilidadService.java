@@ -16,7 +16,6 @@ import com.petcare.reservas.repository.ReservaRepository;
 import com.petcare.servicios.domain.Servicio;
 import com.petcare.servicios.domain.UnidadCobro;
 import com.petcare.servicios.repository.ServicioRepository;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,7 +76,7 @@ public class DisponibilidadService {
         }
         for (BloqueoAgenda b : bloqueoRepository.ocupacion(empleadoIds, inicioDia, finDia)) {
             ocupado.computeIfAbsent(b.getEmpleado().getId(), k -> new ArrayList<>())
-                    .add(aHoraLocal(b.getFechaHoraFin(), b.getFechaHoraFin(), zona, fecha));
+                    .add(aHoraLocal(b.getFechaHoraInicio(), b.getFechaHoraFin(), zona, fecha));
         }
 
         // --- La jornada de ese día, por empleado ---
