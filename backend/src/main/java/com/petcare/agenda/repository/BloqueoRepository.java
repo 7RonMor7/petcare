@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface BloqueoRepository extends JpaRepository<BloqueoAgenda, Long> {
 
-    /*@Query("""
+    @Query("""
         SELECT b FROM BloqueoAgenda b
         WHERE b.empleado.id IN :empleadoIds
           AND b.fechaHoraFin > :desde
@@ -18,5 +18,5 @@ public interface BloqueoRepository extends JpaRepository<BloqueoAgenda, Long> {
         """)
     List<BloqueoAgenda> ocupacion(@Param("empleadoIds") List<Long> empleadoIds,
                                   @Param("desde") Instant desde,
-                                  @Param("hasta") Instant hasta);*/
+                                  @Param("hasta") Instant hasta);
 }
