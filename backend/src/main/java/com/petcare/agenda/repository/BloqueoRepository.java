@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 public interface BloqueoRepository extends JpaRepository<BloqueoAgenda, Long> {
 
@@ -19,4 +20,17 @@ public interface BloqueoRepository extends JpaRepository<BloqueoAgenda, Long> {
     List<BloqueoAgenda> ocupacion(@Param("empleadoIds") List<Long> empleadoIds,
                                   @Param("desde") Instant desde,
                                   @Param("hasta") Instant hasta);
+
+    @Query("""
+        SELECT b FROM BloqueoAgenda b
+        WHERE b.empleado.id = empleadoId
+          AND b.fechaHoraFin > :desde
+          AND b.fechaHoraInicio < :hasta
+        ORDER BY b.fechaHoraInicio
+        """)
+    List<BloqueoAgenda> deEmpleado(@Param("empleadoId") Long empleadoId,
+                                   @Param("desde") Instant desde,
+                                   @Param("hasta") Instant hasta);
+
+    Optional<BloqueoAgenda> findByIdAndEmpleadoId(Long id, Long empleadoId);
 }
