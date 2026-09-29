@@ -36,4 +36,11 @@ public class BloqueoAgenda {
 
     @PrePersist
     void alCrear() { creadoEn = Instant.now(); }
+
+    public BloqueoAgenda(Usuario empleado, Instant fechaHoraInicio, Instant fechaHoraFin, String motivo) {
+        this.empleado = empleado;
+        this.fechaHoraInicio = fechaHoraInicio;
+        this.fechaHoraFin = fechaHoraFin;
+        this.motivo = motivo;
+    }
 }
