@@ -23,7 +23,7 @@ public interface BloqueoRepository extends JpaRepository<BloqueoAgenda, Long> {
 
     @Query("""
         SELECT b FROM BloqueoAgenda b
-        WHERE b.empleado.id = empleadoId
+        WHERE b.empleado.id = :empleadoId
           AND b.fechaHoraFin > :desde
           AND b.fechaHoraInicio < :hasta
         ORDER BY b.fechaHoraInicio
