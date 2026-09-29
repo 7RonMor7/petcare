@@ -14,7 +14,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     @Query("""
             SELECT r FROM Reserva r
             WHERE r.empleado.id IN :empleadoIds
-              AND r.estado IN :estado
+              AND r.estado IN :estados
               AND r.fechaHoraFin > :desde
               AND r.fechaHoraInicio < :hasta
             """)
