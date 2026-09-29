@@ -22,4 +22,17 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
                             @Param("estados") List<EstadoReserva> estados,
                             @Param("desde") Instant desde,
                             @Param("hasta") Instant hasta);
+
+    @Query("""
+            SELECT r.empleado.id, COUNT(r) FROM Reserva r
+            WHERE r.empleado.id IN :empleadoIds
+              AND r.estado IN :estados
+              AND r.fechaHoraFin > :desde
+              AND r.fechaHoraInicio < :hasta
+            GROUP BY r.empleado.id 
+            """)
+    List<Object[]> cargarPorEmpleado(@Param("empleadoIds") List<Long> empleadoIds,
+                                     @Param("estados") List<EstadoReserva> estados,
+                                     @Param("desde") Instant desde,
+                                     @Param("hasta") Instant hasta);
 }
