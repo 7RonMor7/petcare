@@ -1,12 +1,15 @@
 package com.petcare.agenda.service;
 
+import com.petcare.agenda.domain.AsignadorEmpleado;
 import com.petcare.agenda.domain.BloqueoAgenda;
 import com.petcare.agenda.domain.Franja;
 import com.petcare.agenda.domain.GeneradorFranjas;
+import com.petcare.agenda.dto.AsignacionResponse;
 import com.petcare.agenda.dto.FranjaDisponibleResponse;
 import com.petcare.agenda.repository.BloqueoRepository;
 import com.petcare.agenda.repository.EmpleadoServicioRepository;
 import com.petcare.agenda.repository.JornadaRepository;
+import com.petcare.common.error.ConflictoException;
 import com.petcare.common.error.RecursoNoEncontradoException;
 import com.petcare.common.error.ReglaNegocioException;
 import com.petcare.common.parametros.ParametroService;
@@ -37,7 +40,7 @@ public class DisponibilidadService {
     private final ParametroService parametros;
 
     @Transactional(readOnly = true)
-    public List<FranjaDisponibleResponse> consultar(Long servicioId, LocalDate fecha) {
+    public List<FranjaDisponibleResponse> consultar(Long servicioId, LocalDate fecha, Long empleadoId) {
 
         Servicio servicio = servicioRepository.findByIdAndActivoTrue(servicioId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("El servicio no existe"));
@@ -61,6 +64,7 @@ public class DisponibilidadService {
         List<Long> empleadoIds = empleadoServicioRepository
                 .findByServicioIdAndEmpleadoActivoTrue(servicioId).stream()
                 .map(es -> es.getEmpleado().getId())
+                .filter(id -> empleadoId == null || id.equals(empleadoId))   // ← HU-038
                 .toList();
         if (empleadoIds.isEmpty()) return List.of();
 
@@ -90,9 +94,9 @@ public class DisponibilidadService {
         Map<Franja, List<Long>> porFranja = new TreeMap<>(
                 Comparator.comparing(Franja::inicio).thenComparing(Franja::fin));
 
-        for (Long empleadoId : empleadoIds) {
-            List<Franja> jornada = tramos.getOrDefault(empleadoId, List.of());
-            List<Franja> ocupadas = ocupado.getOrDefault(empleadoId, List.of());
+        for (Long id : empleadoIds) {
+            List<Franja> jornada = tramos.getOrDefault(id, List.of());
+            List<Franja> ocupadas = ocupado.getOrDefault(id, List.of());
 
             for (Franja f : GeneradorFranjas.generar(jornada, servicio.getDuracionMinutos(), tamanoFranja)) {
                 boolean chocada = ocupadas.stream().anyMatch(o -> f.seSolapaCon(o.inicio(), o.fin()));
@@ -101,13 +105,37 @@ public class DisponibilidadService {
                 Instant inicioReal = ZonedDateTime.of(fecha, f.inicio(), zona).toInstant();
                 if (inicioReal.isBefore(minimo)) continue;
 
-                porFranja.computeIfAbsent(f, k -> new ArrayList<>()).add(empleadoId);
+                porFranja.computeIfAbsent(f, k -> new ArrayList<>()).add(id);
             }
         }
 
         return porFranja.entrySet().stream()
                 .map(e -> new FranjaDisponibleResponse(e.getKey().inicio(), e.getKey().fin(), e.getValue()))
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public AsignacionResponse asignar(Long servicioId, LocalDate fecha, LocalTime horaInicio) {
+
+        FranjaDisponibleResponse franja = consultar(servicioId, fecha, null).stream()
+                .filter(f -> f.horaInicio().equals(horaInicio))
+                .findFirst()
+                .orElseThrow(() -> new ConflictoException("FRANJA_NO_DISPONIBLE",
+                        "Esa franja ya no está disponible."));
+
+        ZoneId zona = ZoneId.of(parametros.texto(ParametroService.ZONA_HORARIA, "America/Bogota"));
+        Map<Long, Long> carga = reservaRepository.cargarPorEmpleado(
+                franja.empleadoIds(), EstadoReserva.ACTIVOS,
+                fecha.atStartOfDay(zona).toInstant(),
+                fecha.plusDays(1).atStartOfDay(zona).toInstant())
+                .stream()
+                .collect(Collectors.toMap(fila -> (Long) fila[0], fila -> (Long) fila[1]));
+
+        Long elegido = AsignadorEmpleado.elegir(franja.empleadoIds(), carga)
+                .orElseThrow(() -> new ConflictoException("FRANJA_NO:DISPONIBLE",
+                        "Esa franja ya no está disponible."));
+
+        return new AsignacionResponse(elegido, franja.horaInicio(), franja.horaFin());
     }
 
     /** Un instante UTC pasado a la hora local del día consultado, recortado a ese día. */
