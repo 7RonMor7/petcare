@@ -1,6 +1,7 @@
 package com.petcare.agenda.service;
 
 import com.petcare.agenda.domain.BloqueoAgenda;
+import com.petcare.agenda.dto.BloqueoRequest;
 import com.petcare.agenda.dto.BloqueoResponse;
 import com.petcare.agenda.repository.BloqueoRepository;
 import com.petcare.common.error.ConflictoException;
@@ -39,7 +40,7 @@ public class BloqueoService {
     }
 
     @Transactional
-    public BloqueoResponse crear(Long empleadoId, BloqueoResponse datos) {
+    public BloqueoResponse crear(Long empleadoId, BloqueoRequest datos) {
         if (!datos.horaFin().isAfter(datos.horaInicio())) {
             throw new ReglaNegocioException("BLOQUEO_INVALIDO",
                     "La hora de fin debe ser posterior a la de inicio");
