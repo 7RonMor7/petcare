@@ -13,6 +13,8 @@ import ServicioFormPage from "./pages/ServicioFormPage";
 import EmpleadosAdminPage from "./pages/EmpleadosAdminPage";
 import EmpleadoFormPage from "./pages/EmpleadoFormPage";
 import EmpleadoDetallePage from "./pages/EmpleadoDetallePage";
+import ReservarPage from "./pages/ReservarPage";
+import MiAgendaPage from "./pages/MiAgendaPage";
 
 export default function App() {
   return (
@@ -45,6 +47,12 @@ export default function App() {
             <Route path="/admin/empleados/nuevo" element={<EmpleadoFormPage />} />
             <Route path="/admin/empleados/:id" element={<EmpleadoDetallePage />} />
             <Route path="/admin/empleados/:id/editar" element={<EmpleadoFormPage />} />
+          </Route>
+          <Route element={<RutaProtegida permiso="RESERVA_CREAR" />}>
+            <Route path="/reservar" element={<ReservarPage />} />
+          </Route>
+          <Route element={<RutaProtegida permiso="AGENDA_LEER_PROPIA" />}>
+            <Route path="/mi-agenda" element={<MiAgendaPage />} />
           </Route>
         </Route>
       </Route>
