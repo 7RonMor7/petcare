@@ -8,6 +8,7 @@ import com.petcare.servicios.domain.Servicio;
 import com.petcare.servicios.dto.ServicioResponse;
 import com.petcare.servicios.repository.ServicioRepository;
 import com.petcare.usuarios.domain.Usuario;
+import com.petcare.usuarios.dto.EmpleadoPublicoResponse;
 import com.petcare.usuarios.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -61,6 +62,15 @@ public class EmpleadoServicioService {
         return servicios.stream()
                 .sorted(Comparator.comparing(Servicio::getNombre))
                 .map(ServicioResponse::desde)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<EmpleadoPublicoResponse> empleadosDe(Long servicioId) {
+        return empleadoServicioRepository.findByServicioIdAndEmpleadoActivoTrue(servicioId)
+                .stream()
+                .map(es -> EmpleadoPublicoResponse.desde(es.getEmpleado()))
+                .sorted(Comparator.comparing(EmpleadoPublicoResponse::nombre))
                 .toList();
     }
 
