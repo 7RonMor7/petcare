@@ -28,7 +28,8 @@ PetCare/
 │       │   ├── usuarios/     Usuario, Rol, Permiso
 │       │   ├── mascotas/     HU-016 y HU-017
 │       │   ├── servicios/    HU-027, HU-028 y HU-029
-│       │   ├── agenda/       jornada laboral y servicios por empleado
+│       │   ├── agenda/       jornada, bloqueos y motor de disponibilidad
+│       │   ├── reservas/     Reserva y estados (se completa en el Sprint 5)
 │       │   └── common/       CORS, seguridad y manejo de errores
 │       └── resources/
 │           ├── application.yml
@@ -139,6 +140,12 @@ Los tres roles son CLIENTE, EMPLEADO y ADMINISTRADOR. `POST /auth/registro` siem
 | PATCH | `/api/v1/empleados/{id}/estado` | `EMPLEADO_GESTIONAR` | HU-020 |
 | GET/PUT | `/api/v1/empleados/{id}/jornada` | `EMPLEADO_GESTIONAR` | HU-022 |
 | GET/PUT | `/api/v1/empleados/{id}/servicios` | `EMPLEADO_GESTIONAR` | HU-021 |
+| GET | `/api/v1/disponibilidad` | `DISPONIBILIDAD_CONSULTAR` | HU-031, HU-038 |
+| GET | `/api/v1/disponibilidad/asignacion` | `DISPONIBILIDAD_CONSULTAR` | HU-038 |
+| GET | `/api/v1/mi-agenda/jornada` | `AGENDA_LEER_PROPIA` | HU-022 |
+| GET | `/api/v1/mi-agenda/bloqueos` | `AGENDA_LEER_PROPIA` | HU-024 |
+| POST | `/api/v1/mi-agenda/bloqueos` | `AGENDA_BLOQUEAR_PROPIA` | HU-024 |
+| DELETE | `/api/v1/mi-agenda/bloqueos/{id}` | `AGENDA_BLOQUEAR_PROPIA` | HU-024 |
 
 Todos los errores usan el mismo formato:
 
@@ -156,11 +163,14 @@ Todos los errores usan el mismo formato:
 Códigos en uso: `VALIDACION_FALLIDA`, `CUERPO_INVALIDO`, `CORREO_YA_REGISTRADO`,
 `CREDENCIALES_INVALIDAS`, `TOKEN_INVALIDO`, `NO_AUTENTICADO`, `ACCESO_DENEGADO`,
 `RECURSO_NO_ENCONTRADO`, `SERVICIO_YA_EXISTE`, `JORNADA_INVALIDA`, `JORNADA_SOLAPADA`,
-`JORNADA_DESALINEADA`, `JORNADA_FUERA_DE_HORARIO`, `SERVICIO_INACTIVO`.
+`JORNADA_DESALINEADA`, `JORNADA_FUERA_DE_HORARIO`, `SERVICIO_INACTIVO`, `BLOQUEO_INVALIDO`,
+`FECHA_FUERA_DE_RANGO`, `SERVICIO_SIN_AGENDA`, `BLOQUEO_CON_RESERVAS` (409), `FRANJA_NO_DISPONIBLE` (409).
 
 **400 frente a 422.** El `400` significa "no entiendo la petición": falta un campo, o su valor no
 es del tipo esperado. El `422` significa "la entiendo y cada campo es válido, pero la combinación
-rompe una regla del negocio": dos tramos de jornada que se solapan, por ejemplo.
+rompe una regla del negocio": dos tramos de jornada que se solapan, por ejemplo. El `409` es un
+**conflicto con el estado actual**: la misma petición podría valer mañana (una franja que alguien
+acaba de tomar, un bloqueo sobre horas ya reservadas).
 
 **404 y no 403 en los recursos ajenos:** si una mascota no es tuya, la respuesta es la misma que si
 no existiera. Un 403 confirmaría que ese id existe.
@@ -174,7 +184,7 @@ curl http://localhost:8080/api/v1/ping
 # {"servicio":"petcare-backend","estado":"arriba","marcaTiempo":"..."}
 
 curl http://localhost:8080/api/v1/ping/db
-# {"conexion":"ok","motor":"8.4.x","migracionesAplicadas":9}
+# {"conexion":"ok","motor":"8.4.x","migracionesAplicadas":11}
 
 curl http://localhost:8080/actuator/health
 # {"status":"UP", ...}
@@ -192,7 +202,8 @@ entorno y se borran al cerrar el Sprint 1.
 
 ```bash
 cd backend
-mvn test                 # requiere MySQL corriendo
+mvn test                 # requiere MySQL corriendo (el test de contexto)
+mvn test -Dtest=GeneradorFranjasTest   # lógica pura: no necesita base de datos
 mvn package -DskipTests  # si no quieres levantar la base de datos
 ```
 
@@ -216,7 +227,9 @@ apertura, minutos de expiración de un pago) vive en `parametro_sistema` y se le
 **Precios.** Siempre `DECIMAL` y `BigDecimal`, nunca `double`. El total de una reserva se calculará
 con la `unidadCobro` del servicio y se congelará al crearla: cambiar el catálogo no altera lo vendido.
 
-**Fechas.** Todo se guarda en UTC. La conversión a `America/Bogota` ocurre solo al mostrar.
+**Fechas.** Todo se guarda en UTC; la zona vive en `parametro_sistema` (`zona_horaria`). La jornada
+se define en hora local y la conversión ocurre en la frontera (DTO ↔ servicio). Al insertar datos de
+prueba con SQL, la conversión hay que hacerla a mano: 09:00 en Bogotá son las 14:00 en la columna.
 
 **Ramas.** Una por historia: `feat/HU-007-registro-cliente`. Commits que digan qué hacen: `HU-007: validar unicidad del correo en el registro`.
 
@@ -232,7 +245,8 @@ con la `unidadCobro` del servicio y se congelará al crearla: cambiar el catálo
 | 1 | Registro, login, autorización, logout, mascotas | Completado |
 | 2 | Gestión de mascotas y catálogo de servicios | Completado |
 | 3 | Empleados, jornada laboral y servicios por empleado | Completado |
-| 4 | Motor de disponibilidad | En curso |
+| 4 | Motor de disponibilidad | Completado |
+| 5 | Creación de reservas y concurrencia | En curso |
 
 Historias cerradas: **HU-007** (registro), **HU-008** (login con JWT), **HU-009** (autorización por
 permisos), **HU-010** (logout con revocación), **HU-016** (registrar mascota), **HU-017** (listar,
@@ -241,5 +255,8 @@ editar y eliminar mascotas propias), **HU-018** (interfaz de gestión de mascota
 
 Sprint 3: **HU-020** (empleados), **HU-022** (jornada laboral semanal) y **HU-021** (servicios que
 presta cada empleado) — los tres insumos del motor de disponibilidad.
+
+Sprint 4: **HU-030** (generación de franjas), **HU-031** (disponibilidad real), **HU-024** (bloqueos
+de agenda, RB13) y **HU-038** (elección de empleado o asignación automática).
 
 El análisis, el backlog y las guías de cada historia están en `docs/`.
