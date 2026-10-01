@@ -40,20 +40,20 @@ export default function MiAgendaPage() {
     setErrorGeneral('');
     setEnviando(true);
     try {
-        await cliente.post('/mi-agenda/bloques', { ...form, motivo: form.motivo.trim() || null });
-        setForm(VACIO);
-        await cargarBloqueos();
+      await cliente.post('/mi-agenda/bloqueos', { ...form, motivo: form.motivo.trim() || null });
+      setForm(VACIO);
+      await cargarBloqueos();
     } catch (error) {
-        setErrorGeneral(mensajeError(error));
+      setErrorGeneral(mensajeError(error));
     } finally {
-        setEnviando(false);
+      setEnviando(false);
     }
   }
 
   async function eliminar(id) {
     setErrorGeneral('');
     try {
-      await cliente.delete(`/mi-agenda/bloques/${id}`);
+      await cliente.delete(`/mi-agenda/bloqueos/${id}`);
       setBloqueos((actuales) => actuales.filter((b) => b.id !== id));
     } catch (error) {
       setErrorGeneral(mensajeError(error));
