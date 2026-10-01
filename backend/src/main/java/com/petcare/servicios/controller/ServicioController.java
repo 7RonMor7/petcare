@@ -1,10 +1,12 @@
 package com.petcare.servicios.controller;
 
+import com.petcare.agenda.service.EmpleadoServicioService;
 import com.petcare.common.dto.EstadoRequest;
 import com.petcare.servicios.dto.ServicioAdminResponse;
 import com.petcare.servicios.dto.ServicioRequest;
 import com.petcare.servicios.dto.ServicioResponse;
 import com.petcare.servicios.service.ServicioService;
+import com.petcare.usuarios.dto.EmpleadoPublicoResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,7 @@ import java.util.List;
 public class ServicioController {
 
     private final ServicioService servicioService;
+    private final EmpleadoServicioService empleadoServicioService;
 
     @GetMapping
     public List<ServicioResponse> listar() {
@@ -34,6 +37,12 @@ public class ServicioController {
     @PreAuthorize("hasAuthority('SERVICIO_GESTIONAR')")
     public List<ServicioAdminResponse> listarTodos() {
         return servicioService.listarTodos();
+    }
+
+    @GetMapping("/{id}/empleados")
+    @PreAuthorize("hasAuthority('DISPONIBILIDAD_CONSULTAR')")
+    public List<EmpleadoPublicoResponse> empleadosDelServicio(@PathVariable Long id) {
+        return empleadoServicioService.empleadosDe(id);
     }
 
     @PostMapping
