@@ -1,5 +1,6 @@
 package com.petcare.reservas.domain;
 
+import com.petcare.common.error.ReglaNegocioException;
 import com.petcare.mascotas.domain.Mascota;
 import com.petcare.servicios.domain.Servicio;
 import com.petcare.usuarios.domain.Usuario;
@@ -58,4 +59,30 @@ public class Reserva {
 
     @Column(name = "actualizado_en", nullable = false)
     private Instant actualizadoEn;
+
+    public Reserva(Usuario cliente, Mascota mascota, Servicio servicio, Usuario empleado,
+                   Instant fechaHoraInicio, Instant fechaHoraFin, BigDecimal total) {
+        this.cliente = cliente;
+        this.mascota = mascota;
+        this.servicio = servicio;
+        this.empleado = empleado;
+        this.fechaHoraInicio = fechaHoraInicio;
+        this.fechaHoraFin = fechaHoraFin;
+        this.total = total;
+        this.estado = EstadoReserva.PENDIENTE_PAGO;
+    }
+
+    public void cambiarEstado(EstadoReserva destino) {
+        if (!estado.puedePasarA(destino)) {
+            throw new ReglaNegocioException("TRANSICION_INVALIDA",
+                    "Una reserva " + estado + " no puede pasar a " + destino);
+        }
+        this.estado = destino;
+    }
+
+    @PrePersist
+    void alCrear() { creadoEn = actualizadoEn = Instant.now(); }
+
+    @PreUpdate
+    void alActualizar() { actualizadoEn = Instant.now(); }
 }
