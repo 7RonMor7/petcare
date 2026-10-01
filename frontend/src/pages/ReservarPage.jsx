@@ -32,7 +32,7 @@ export default function ReservarPage() {
   // Empleados del servicio elegido
   useEffect(() => {
     setEmpleadoId('');
-    setEMpleados([]);
+    setEmpleados([]);
     if (!servicioId) return;
     cliente.get(`/servicios/${servicioId}/empleados`)
         .then(({ data }) => setEmpleados(data))
