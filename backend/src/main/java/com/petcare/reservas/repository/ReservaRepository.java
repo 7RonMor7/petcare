@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
@@ -35,4 +36,8 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
                                      @Param("estados") List<EstadoReserva> estados,
                                      @Param("desde") Instant desde,
                                      @Param("hasta") Instant hasta);
+
+    List<Reserva> findByClienteIdOrderByFechaHoraInicioDesc(Long clienteId);
+
+    Optional<Reserva> findByIdAndClienteId(Long id, Long clienteId);
 }
