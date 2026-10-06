@@ -8,6 +8,7 @@ import com.petcare.common.error.ReglaNegocioException;
 import com.petcare.common.parametros.ParametroService;
 import com.petcare.mascotas.domain.Mascota;
 import com.petcare.mascotas.repository.MascotaRepository;
+import com.petcare.pagos.service.OrdenPagoService;
 import com.petcare.reservas.domain.OcupacionFranja;
 import com.petcare.reservas.domain.Reserva;
 import com.petcare.reservas.dto.ReservaRequest;
@@ -40,6 +41,7 @@ public class ReservaService {
     private final ServicioRepository servicioRepository;
     private final UsuarioRepository usuarioRepository;
     private final DisponibilidadService disponibilidadService;
+    private final OrdenPagoService ordenPagoService;
     private final ParametroService parametros;
 
     @Transactional
@@ -101,6 +103,7 @@ public class ReservaService {
                     "Ese horario acaba de ser tomado por otra reserva");
         }
 
+        ordenPagoService.emitirPara(reserva);
         return ReservaResponse.desde(reserva, zona);
     }
 
