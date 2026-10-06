@@ -16,6 +16,7 @@ public class ParametroService {
     public static final String ANTELACION_MINIMA = "antelacion_minima_horas";
     public static final String ANTELACION_MAXIMA = "antelacion_maxima_dias";
     public static final String ZONA_HORARIA = "zona_horaria";
+    public static final String EXPIRACION_PAGO = "expiracion_pago_minutos";
 
     private final ParametroRepository parametroRepository;
 
