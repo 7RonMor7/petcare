@@ -53,3 +53,7 @@ petcare:
     secreto: ${JWT_SECRETO:clave-de-desarrollo-petcare-cambiar-en-produccion-2026}
     expiracion-access-minutos: ${JWT_ACCESS_MINUTOS:15}
     expiracion-refresh-dias: ${JWT_REFRESH_DIAS:7}
+  pagos:
+    proveedor: ${PAGOS_PROVEEDOR:simulado}
+    secreto-webhook: ${PAGOS_SECRETO:secreto-de-desarrollo-cambiar-en-produccion}
+    url-checkout: ${PAGOS_URL_CHECKOUT:http://localhost:5173/pago-simulado}
