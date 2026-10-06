@@ -91,6 +91,14 @@ public class ManejadorErrores {
         return construir(HttpStatus.CONFLICT, ex.getCodigo(), ex.getMessage(), peticion, null);
     }
 
+    @ExceptionHandler(FirmaInvalidaException.class)
+    public ResponseEntity<RespuestaError> firmaInvalida(
+            FirmaInvalidaException ex, HttpServletRequest peticion) {
+
+        return construir(HttpStatus.UNAUTHORIZED, "FIRMA_INVALIDA",
+                ex.getMessage(), peticion, null);
+    }
+
     private ResponseEntity<RespuestaError> construir(
             HttpStatus estado, String codigo, String mensaje,
             HttpServletRequest peticion, List<RespuestaError.DetalleError> detalles){
