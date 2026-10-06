@@ -1,5 +1,7 @@
 package com.petcare.reservas.controller;
 
+import com.petcare.pagos.dto.OrdenPagoResponse;
+import com.petcare.pagos.service.OrdenPagoService;
 import com.petcare.reservas.dto.ReservaRequest;
 import com.petcare.reservas.dto.ReservaResponse;
 import com.petcare.reservas.service.ReservaService;
@@ -18,6 +20,7 @@ import java.util.List;
 public class ReservaController {
 
     private final ReservaService reservaService;
+    private final OrdenPagoService ordenPagoService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -36,5 +39,11 @@ public class ReservaController {
     @PreAuthorize("hasAuthority('RESERVA_LEER_PROPIA')")
     public ReservaResponse obtener(@PathVariable Long id, Authentication auth) {
         return reservaService.obtenerPropia(id, (Long)  auth.getPrincipal());
+    }
+
+    @GetMapping("/{id}/pago")
+    @PreAuthorize("hasAuthority('PAGO_LEER_PROPIO')")
+    public OrdenPagoResponse pago(@PathVariable Long id, Authentication auth) {
+        return ordenPagoService.ordenVigenteDe(id, (Long) auth.getPrincipal());
     }
 }
