@@ -1,12 +1,9 @@
-package com.petcare.agenda.domain;
+package com.petcare.pagos.gateway;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petcare.common.error.FirmaInvalidaException;
 import com.petcare.pagos.domain.EstadoOrdenPago;
 import com.petcare.pagos.domain.OrdenPago;
-import com.petcare.pagos.gateway.EventoPago;
-import com.petcare.pagos.gateway.PasarelaSimulada;
-import com.petcare.pagos.gateway.SesionCheckout;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
