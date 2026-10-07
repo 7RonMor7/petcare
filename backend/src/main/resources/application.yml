@@ -44,7 +44,7 @@ management:
 
 logging:
   level:
-    com.petcare: INFO
+    com.petcare: DEBUG
 
 petcare:
   cors:
