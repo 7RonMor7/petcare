@@ -1,5 +1,7 @@
-package com.petcare.agenda.domain;
+package com.petcare.reservas;
 
+import com.petcare.agenda.domain.Franja;
+import com.petcare.agenda.domain.GeneradorFranjas;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
