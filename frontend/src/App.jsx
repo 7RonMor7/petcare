@@ -15,6 +15,7 @@ import EmpleadoFormPage from "./pages/EmpleadoFormPage";
 import EmpleadoDetallePage from "./pages/EmpleadoDetallePage";
 import ReservarPage from "./pages/ReservarPage";
 import MiAgendaPage from "./pages/MiAgendaPage";
+import PagoSimuladoPage from "./pages/PagoSimuladoPage";
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/registro" element={<RegistroPage />} />
       <Route path="/servicios" element={<CatalogoPage />} />
+      <Route path="/pago-simulado" element={<PagoSimuladoPage />} />
 
       {/* Privadas: primero el guardián, después el marco con la barra */}
       <Route element={<RutaProtegida />}>
