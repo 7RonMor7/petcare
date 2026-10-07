@@ -40,6 +40,9 @@ public class OrdenPago {
     @Column(name = "referencia_externa", length = 100)
     private String referenciaExterna;
 
+    @Column(name = "url_checkout", length = 500)
+    private String urlCheckout;
+
     @Column(length = 30)
     private String proveedor;
 
@@ -68,9 +71,14 @@ public class OrdenPago {
         this.estado = destino;
     }
 
-    public void registrarEnPasarela(String proveedor, String referenciaExterna) {
+    public void registrarEnPasarela(String proveedor, String referenciaExterna, String urlCheckout) {
         this.proveedor = proveedor;
         this.referenciaExterna = referenciaExterna;
+        this.urlCheckout = urlCheckout;
+    }
+
+    public boolean tieneCheckoutAbierto() {
+        return referenciaExterna != null && urlCheckout != null;
     }
 
     public boolean estaVencida(Instant ahora) {
