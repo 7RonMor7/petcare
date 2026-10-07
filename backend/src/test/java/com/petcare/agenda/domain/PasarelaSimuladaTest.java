@@ -1,6 +1,7 @@
 package com.petcare.agenda.domain;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.petcare.common.error.FirmaInvalidaException;
 import com.petcare.pagos.domain.EstadoOrdenPago;
 import com.petcare.pagos.domain.OrdenPago;
 import com.petcare.pagos.gateway.EventoPago;
@@ -46,12 +47,34 @@ public class PasarelaSimuladaTest {
     @DisplayName("Con la firma correcta, el evento se traduce")
     void eventoValido() {
         String cuerpo = """
-                {"refernecia":"SIM-123","estado":"APROBADO","monto":25000.00,"moneda":"COP"}""";
+                {"referencia":"SIM-123","estado":"APROBADO","monto":25000.00,"moneda":"COP"}""";
 
         EventoPago evento = pasarela.interpretar(cuerpo, pasarela.firmar(cuerpo));
 
         assertEquals("SIM-123", evento.referenciaExterna());
         assertEquals(EstadoOrdenPago.APROBADO, evento.estado());
         assertEquals(0, new BigDecimal("25000.00").compareTo(evento.monto()));
+    }
+
+    @Test
+    @DisplayName("Una firma ajena se rechaza")
+    void firmaInvalida() {
+        String cuerpo = """
+                {"refernecia":"SIM-123","estado":"APROBADO","monto":25000.00,"moneda":"COP"}""";
+
+        assertThrows(FirmaInvalidaException.class, () -> pasarela.interpretar(cuerpo, "firma-falsa"));
+        assertThrows(FirmaInvalidaException.class, () -> pasarela.interpretar(cuerpo, null));
+    }
+
+    @Test
+    @DisplayName("Si el cuerpo cambia aunque sea un peso, la firma deja de valer")
+    void cuerpoAlterado() {
+        String original = """
+                {"referencia":"SIM-123","estado":"APROBADO","monto":25000.00,"moneda":"COP"}""";
+        String alterado = original.replace("25000.00", "1.00");
+
+        String firma = pasarela.firmar(original);
+
+        assertThrows(FirmaInvalidaException.class, () -> pasarela.interpretar(alterado, firma));
     }
 }
