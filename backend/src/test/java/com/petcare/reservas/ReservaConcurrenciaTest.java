@@ -139,7 +139,7 @@ class ReservaConcurrenciaTest {
             ocupacionFranjaRepository.deleteAll(ocupacionFranjaRepository.findByReservaId(r.getId()));
         }
         reservaRepository.deleteAll(mias);
-        
+
         empleadoServicioRepository.deleteAll(
                 empleadoServicioRepository.findByEmpleadoIdOrderByServicioNombreAsc(empleado.getId()));
         jornadaRepository.deleteAll(
