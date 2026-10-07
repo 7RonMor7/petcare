@@ -48,7 +48,9 @@ public class ConfiguracionSeguridad {
                                 "/api/v1/ping",
                                 "/api/v1/ping/db",
                                 "/actuator/health",
-                                "/error"
+                                "/error",
+                                "/api/v1/webhooks/pagos",
+                                "/api/v1/webhooks/pagos/simular"
                         ).permitAll()
 
                         // Catálogo: solo lectura pública. El POST, PUT y PATCH exigen permiso.
