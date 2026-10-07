@@ -54,7 +54,7 @@ public class ConfiguracionSeguridad {
                         // Catálogo: solo lectura pública. El POST, PUT y PATCH exigen permiso.
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/servicios",
-                                "api/v1/servicios/*"
+                                "/api/v1/servicios/*"
                         ).permitAll()
 
                         .anyRequest().authenticated()
