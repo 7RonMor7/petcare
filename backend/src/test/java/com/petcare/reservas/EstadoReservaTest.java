@@ -1,4 +1,4 @@
-package com.petcare.agenda.domain;
+package com.petcare.reservas;
 
 import com.petcare.reservas.domain.EstadoReserva;
 import org.junit.jupiter.api.DisplayName;
