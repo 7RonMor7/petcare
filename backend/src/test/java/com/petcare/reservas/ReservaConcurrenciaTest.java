@@ -8,7 +8,10 @@ import com.petcare.mascotas.domain.Especie;
 import com.petcare.mascotas.domain.Mascota;
 import com.petcare.mascotas.domain.Sexo;
 import com.petcare.mascotas.repository.MascotaRepository;
+import com.petcare.pagos.repository.OrdenPagoRepository;
+import com.petcare.reservas.domain.Reserva;
 import com.petcare.reservas.dto.ReservaRequest;
+import com.petcare.reservas.dto.ReservaResponse;
 import com.petcare.reservas.repository.OcupacionFranjaRepository;
 import com.petcare.reservas.repository.ReservaRepository;
 import com.petcare.reservas.service.ReservaService;
@@ -48,6 +51,7 @@ class ReservaConcurrenciaTest {
     @Autowired private EmpleadoServicioRepository empleadoServicioRepository;
     @Autowired private ReservaRepository reservaRepository;
     @Autowired private OcupacionFranjaRepository ocupacionFranjaRepository;
+    @Autowired private OrdenPagoRepository ordenPagoRepository;
 
     private Usuario cliente;
     private Usuario empleado;
@@ -121,13 +125,21 @@ class ReservaConcurrenciaTest {
 
         // La base de datos tiene que contarlo igual
         assertEquals(1, reservaRepository.findByClienteIdOrderByFechaHoraInicioDesc(cliente.getId()).size());
-        assertEquals(2, ocupacionFranjaRepository.count(), "60 minutos - dos franjas de 30");
+        Reserva creada = reservaRepository.findByClienteIdOrderByFechaHoraInicioDesc(cliente.getId())
+                        .stream().findFirst().orElseThrow();
+
+        assertEquals(2, ocupacionFranjaRepository.countByReservaId(creada.getId()), "60 minutos - dos franjas de 30");
     }
 
     @AfterEach
     void limpiar() {
-        ocupacionFranjaRepository.deleteAll();
-        reservaRepository.deleteAll();
+        List<Reserva> mias = reservaRepository.findByClienteIdOrderByFechaHoraInicioDesc(cliente.getId());
+        for (Reserva r : mias) {
+            ordenPagoRepository.deleteAll(ordenPagoRepository.findByReservaIdOrderByCreadoEnDesc(r.getId()));
+            ocupacionFranjaRepository.deleteAll(ocupacionFranjaRepository.findByReservaId(r.getId()));
+        }
+        reservaRepository.deleteAll(mias);
+        
         empleadoServicioRepository.deleteAll(
                 empleadoServicioRepository.findByEmpleadoIdOrderByServicioNombreAsc(empleado.getId()));
         jornadaRepository.deleteAll(
