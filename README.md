@@ -29,7 +29,8 @@ PetCare/
 │       │   ├── mascotas/     HU-016 y HU-017
 │       │   ├── servicios/    HU-027, HU-028 y HU-029
 │       │   ├── agenda/       jornada, bloqueos y motor de disponibilidad
-│       │   ├── reservas/     Reserva y estados (se completa en el Sprint 5)
+│       │   ├── reservas/     reservas, estados y ocupación de franjas
+│       │   ├── pagos/        órdenes, checkout, webhook y adaptadores de pasarela
 │       │   └── common/       CORS, seguridad y manejo de errores
 │       └── resources/
 │           ├── application.yml
@@ -114,6 +115,24 @@ Los tres roles son CLIENTE, EMPLEADO y ADMINISTRADOR. `POST /auth/registro` siem
 
 ---
 
+## Pagos
+
+La pasarela elegida es **Wompi** (ver `docs/15`), pero el código no depende de ella: habla con el
+puerto `PaymentGateway`. El adaptador se elige con `PAGOS_PROVEEDOR`; por defecto es `simulado`, que
+permite recorrer el ciclo completo sin credenciales desde la pantalla `/pago-simulado`.
+
+```
+reserva creada → orden PENDIENTE (15 min) → checkout → webhook firmado
+                                                    ├─ APROBADO  → reserva CONFIRMADA (RB03)
+                                                    └─ RECHAZADO → sigue PENDIENTE_PAGO
+```
+
+El webhook valida **firma, idempotencia y monto**. Ninguna otra ruta confirma una reserva: el
+retorno del navegador no vale como prueba de pago.
+
+Variables: `PAGOS_PROVEEDOR`, `PAGOS_SECRETO`, `PAGOS_URL_CHECKOUT`, `PAGOS_URL_RETORNO`. Las
+credenciales reales van en el entorno, nunca en el repositorio.
+
 ## Endpoints
 
 | Método | Ruta | Permiso | Historia |
@@ -146,6 +165,12 @@ Los tres roles son CLIENTE, EMPLEADO y ADMINISTRADOR. `POST /auth/registro` siem
 | GET | `/api/v1/mi-agenda/bloqueos` | `AGENDA_LEER_PROPIA` | HU-024 |
 | POST | `/api/v1/mi-agenda/bloqueos` | `AGENDA_BLOQUEAR_PROPIA` | HU-024 |
 | DELETE | `/api/v1/mi-agenda/bloqueos/{id}` | `AGENDA_BLOQUEAR_PROPIA` | HU-024 |
+| POST | `/api/v1/reservas` | `RESERVA_CREAR` | HU-032 |
+| GET | `/api/v1/reservas` | `RESERVA_LEER_PROPIA` | HU-032 |
+| GET | `/api/v1/reservas/{id}` | `RESERVA_LEER_PROPIA` | HU-032 |
+| GET | `/api/v1/reservas/{id}/pago` | `PAGO_LEER_PROPIO` | HU-039 |
+| POST | `/api/v1/reservas/{id}/pago/checkout` | `RESERVA_CREAR` | HU-040 |
+| POST | `/api/v1/webhooks/pagos` | público (firma) | HU-041, HU-042 |
 
 Todos los errores usan el mismo formato:
 
@@ -164,7 +189,9 @@ Códigos en uso: `VALIDACION_FALLIDA`, `CUERPO_INVALIDO`, `CORREO_YA_REGISTRADO`
 `CREDENCIALES_INVALIDAS`, `TOKEN_INVALIDO`, `NO_AUTENTICADO`, `ACCESO_DENEGADO`,
 `RECURSO_NO_ENCONTRADO`, `SERVICIO_YA_EXISTE`, `JORNADA_INVALIDA`, `JORNADA_SOLAPADA`,
 `JORNADA_DESALINEADA`, `JORNADA_FUERA_DE_HORARIO`, `SERVICIO_INACTIVO`, `BLOQUEO_INVALIDO`,
-`FECHA_FUERA_DE_RANGO`, `SERVICIO_SIN_AGENDA`, `BLOQUEO_CON_RESERVAS` (409), `FRANJA_NO_DISPONIBLE` (409).
+`FECHA_FUERA_DE_RANGO`, `SERVICIO_SIN_AGENDA`, `BLOQUEO_CON_RESERVAS` (409), `FRANJA_NO_DISPONIBLE` (409),
+`RESERVA_NO_PAGABLE` (409), `ORDEN_VENCIDA` (409), `MONTO_NO_COINCIDE` (409), `TRANSICION_INVALIDA`,
+`FIRMA_INVALIDA` (401).
 
 **400 frente a 422.** El `400` significa "no entiendo la petición": falta un campo, o su valor no
 es del tipo esperado. El `422` significa "la entiendo y cada campo es válido, pero la combinación
@@ -184,7 +211,7 @@ curl http://localhost:8080/api/v1/ping
 # {"servicio":"petcare-backend","estado":"arriba","marcaTiempo":"..."}
 
 curl http://localhost:8080/api/v1/ping/db
-# {"conexion":"ok","motor":"8.4.x","migracionesAplicadas":11}
+# {"conexion":"ok","motor":"8.4.x","migracionesAplicadas":15}
 
 curl http://localhost:8080/actuator/health
 # {"status":"UP", ...}
@@ -246,7 +273,8 @@ prueba con SQL, la conversión hay que hacerla a mano: 09:00 en Bogotá son las 
 | 2 | Gestión de mascotas y catálogo de servicios | Completado |
 | 3 | Empleados, jornada laboral y servicios por empleado | Completado |
 | 4 | Motor de disponibilidad | Completado |
-| 5 | Creación de reservas y concurrencia | En curso |
+| 5 | Creación de reservas y concurrencia | Completado |
+| 6 | Checkout, webhook y ciclo completo de pago | En curso |
 
 Historias cerradas: **HU-007** (registro), **HU-008** (login con JWT), **HU-009** (autorización por
 permisos), **HU-010** (logout con revocación), **HU-016** (registrar mascota), **HU-017** (listar,
@@ -258,5 +286,10 @@ presta cada empleado) — los tres insumos del motor de disponibilidad.
 
 Sprint 4: **HU-030** (generación de franjas), **HU-031** (disponibilidad real), **HU-024** (bloqueos
 de agenda, RB13) y **HU-038** (elección de empleado o asignación automática).
+
+Sprints 5 y 6: **HU-032** (crear reserva), **HU-033** (concurrencia garantizada en base de datos),
+**HU-035** (máquina de estados), **HU-039** (orden de pago), **HU-003** y **HU-004** (pasarela y
+puerto con adaptador simulado), **HU-040** (checkout) y **HU-041**/**HU-042** (webhook firmado y
+confirmación de la reserva).
 
 El análisis, el backlog y las guías de cada historia están en `docs/`.
