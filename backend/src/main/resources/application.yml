@@ -58,3 +58,5 @@ petcare:
     secreto-webhook: ${PAGOS_SECRETO:secreto-de-desarrollo-cambiar-en-produccion}
     url-checkout: ${PAGOS_URL_CHECKOUT:http://localhost:5173/pago-simulado}
     url-retorno: ${PAGOS_URL_RETORNO:http://localhost:5173/reservas}
+  expiracion:
+    cada-ms: 60000
