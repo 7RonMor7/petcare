@@ -15,7 +15,7 @@ public record ReservaResponse(
         EstadoReserva estado, BigDecimal total
 ) {
     public static ReservaResponse desde (Reserva r, ZoneId zona) {
-        LocalDateTime inicio = LocalDateTime.ofInstant(r.getFechaHoraFin(), zona);
+        LocalDateTime inicio = LocalDateTime.ofInstant(r.getFechaHoraInicio(), zona);
         LocalDateTime fin = LocalDateTime.ofInstant(r.getFechaHoraFin(), zona);
         return new ReservaResponse(
                 r.getId(), r.getServicio().getNombre(), r.getMascota().getNombre(),
