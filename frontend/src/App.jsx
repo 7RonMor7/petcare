@@ -15,6 +15,7 @@ import EmpleadoFormPage from "./pages/EmpleadoFormPage";
 import EmpleadoDetallePage from "./pages/EmpleadoDetallePage";
 import ReservarPage from "./pages/ReservarPage";
 import MiAgendaPage from "./pages/MiAgendaPage";
+import MisReservasPage from "./pages/MisReservasPage";
 import PagoSimuladoPage from "./pages/PagoSimuladoPage";
 
 export default function App() {
@@ -52,6 +53,9 @@ export default function App() {
           </Route>
           <Route element={<RutaProtegida permiso="RESERVA_CREAR" />}>
             <Route path="/reservar" element={<ReservarPage />} />
+          </Route>
+          <Route element={<RutaProtegida permiso="RESERVA_LEER_PROPIA" />}>
+            <Route path="/reservas" element={<MisReservasPage />} />
           </Route>
           <Route element={<RutaProtegida permiso="AGENDA_LEER_PROPIA" />}>
             <Route path="/mi-agenda" element={<MiAgendaPage />} />
