@@ -28,8 +28,10 @@ public class OrdenPagoService {
     @Transactional
     public OrdenPago emitirPara(Reserva reserva) {
         int minutos = parametros.entero(ParametroService.EXPIRACION_PAGO, 15);
+        Instant limite = (reserva.getCreadoEn() != null ? reserva.getCreadoEn() : Instant.now())
+                .plus(minutos, ChronoUnit.MINUTES);
         return ordenPagoRepository.save(
-                new OrdenPago(reserva, Instant.now().plus(minutos, ChronoUnit.MINUTES)));
+                new OrdenPago(reserva, limite));
     }
 
     @Transactional(readOnly = true)
