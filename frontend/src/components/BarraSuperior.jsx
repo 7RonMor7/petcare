@@ -12,6 +12,7 @@ const ENLACES = [
   { a: '/mascotas', texto: 'Mis mascotas', permiso: 'MASCOTA_LEER_PROPIA' },
   { a: '/servicios', texto: 'Servicios', permiso: null },
   { a: '/reservar', texto: 'Reservar', permiso: 'RESERVA_CREAR' },
+  { a: '/reservas', texto: 'Mis reservas', permiso: 'RESERVA_LEER_PROPIA' },
   { a: '/mi-agenda', texto: 'Mi agenda', permiso: 'AGENDA_LEER_PROPIA' },
   { a: '/admin/servicios', texto: 'Servicios (admin)', permiso: 'SERVICIO_GESTIONAR' },
   { a: '/admin/empleados', texto: 'Empleados', permiso: 'EMPLEADO_GESTIONAR' },
