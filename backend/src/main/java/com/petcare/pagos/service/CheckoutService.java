@@ -25,6 +25,7 @@ public class CheckoutService {
 
     private final ReservaRepository reservaRepository;
     private final OrdenPagoRepository ordenPagoRepository;
+    private final OrdenPagoService ordenPagoService;
     private final PaymentGateway pasarela;             // <- el puerto, no una implementación
 
     @Value("${petcare.pagos.url-retorno}")
@@ -42,7 +43,7 @@ public class CheckoutService {
 
         OrdenPago orden = ordenPagoRepository
                 .findByReservaIdAndEstado(reservaId, EstadoOrdenPago.PENDIENTE)
-                .orElseThrow(() -> new RecursoNoEncontradoException("No hay orden de pago pendiente"));
+                .orElseGet(() -> ordenPagoService.emitirPara(reserva));   // HU-043: reintento
 
         if (orden.estaVencida(Instant.now())) {
             throw new ConflictoException("ORDEN_VENCIDA",
