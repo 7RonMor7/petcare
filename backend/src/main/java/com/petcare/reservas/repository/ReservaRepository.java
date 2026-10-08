@@ -40,4 +40,6 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     List<Reserva> findByClienteIdOrderByFechaHoraInicioDesc(Long clienteId);
 
     Optional<Reserva> findByIdAndClienteId(Long id, Long clienteId);
+
+    List<Reserva> findByEstadoAndCreadoEnBefore(EstadoReserva estado, Instant limite);
 }
