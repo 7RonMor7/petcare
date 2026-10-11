@@ -55,4 +55,10 @@ public class ReservaController {
     public CheckoutResponse checkout(@PathVariable Long id, Authentication auth) {
         return checkoutService.iniciar(id, (Long) auth.getPrincipal());
     }
+
+    @PostMapping("/{id}/cancelar")
+    @PreAuthorize("hasAuthority('RESERVA_CANCELAR_PROPIA')")
+    public ReservaResponse cancelar(@PathVariable Long id, Authentication auth) {
+        return reservaService.cancelar(id, (Long) auth.getPrincipal());
+    }
 }
