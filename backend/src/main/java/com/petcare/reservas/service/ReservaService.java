@@ -8,7 +8,10 @@ import com.petcare.common.error.ReglaNegocioException;
 import com.petcare.common.parametros.ParametroService;
 import com.petcare.mascotas.domain.Mascota;
 import com.petcare.mascotas.repository.MascotaRepository;
+import com.petcare.pagos.domain.EstadoOrdenPago;
+import com.petcare.pagos.repository.OrdenPagoRepository;
 import com.petcare.pagos.service.OrdenPagoService;
+import com.petcare.reservas.domain.EstadoReserva;
 import com.petcare.reservas.domain.OcupacionFranja;
 import com.petcare.reservas.domain.Reserva;
 import com.petcare.reservas.dto.ReservaRequest;
@@ -20,6 +23,7 @@ import com.petcare.servicios.domain.UnidadCobro;
 import com.petcare.servicios.repository.ServicioRepository;
 import com.petcare.usuarios.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +35,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReservaService {
@@ -42,6 +47,7 @@ public class ReservaService {
     private final UsuarioRepository usuarioRepository;
     private final DisponibilidadService disponibilidadService;
     private final OrdenPagoService ordenPagoService;
+    private final OrdenPagoRepository ordenPagoRepository;
     private final ParametroService parametros;
 
     @Transactional
@@ -120,5 +126,44 @@ public class ReservaService {
         return reservaRepository.findByIdAndClienteId(id, clienteId)
                 .map(r -> ReservaResponse.desde(r, zona))
                 .orElseThrow(() -> new RecursoNoEncontradoException("La reserva no existe"));
+    }
+
+    @Transactional
+    public ReservaResponse cancelar(Long reservaId, Long clienteId) {
+
+        Reserva reserva = reservaRepository.findByIdAndClienteId(reservaId, clienteId)
+                .orElseThrow(() -> new RecursoNoEncontradoException("La reserva no existe"));
+
+        if (reserva.getEstado() != EstadoReserva.PENDIENTE_PAGO && reserva.getEstado() != EstadoReserva.CONFIRMADA) {
+            throw new ConflictoException("RESERVA_NO_CANCELABLE",
+                    "Una reserva en estado " + reserva.getEstado() + " no se puede cancelar");
+        }
+
+        // RB06: solo hasta N horas antes del servicio
+        int horas = parametros.entero(ParametroService.CANCELACION_MINIMA, 24);
+        Instant limite = reserva.getFechaHoraInicio().minus(horas, ChronoUnit.HOURS);
+
+        if (Instant.now().isAfter(limite)) {
+            throw new ReglaNegocioException("FUERA_DE_PLAZO_CANCELACION",
+                    "Solo puedes cancelar hasta " + horas + " horas antes del servcio");
+        }
+
+        boolean habiaPago = reserva.getEstado() == EstadoReserva.CONFIRMADA;
+
+        reserva.cambiarEstado(EstadoReserva.CANCELADA);
+        ocupacionRepository.deleteByReservaId(reservaId);   // se libera la franja
+
+        ordenPagoRepository.findByReservaIdOrderByCreadoEnDesc(reservaId).stream()
+                .filter(o -> o.getEstado() == EstadoOrdenPago.PENDIENTE)
+                .forEach(o -> o.cambiarEstado(EstadoOrdenPago.EXPIRADO));
+
+        if (habiaPago) {
+            log.info("Reserva {} cancelada CON pago aprobado: queda pendiente de reembolso", reservaId);
+        } else {
+            log.info("Reserva {} cancelada sin pago", reservaId);
+        }
+
+        ZoneId zona = ZoneId.of(parametros.texto(ParametroService.ZONA_HORARIA, "America/Bogota"));
+        return ReservaResponse.desde(reserva, zona);
     }
 }
