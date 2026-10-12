@@ -5,11 +5,14 @@ import { mensajeError } from '../api/errores';
 import { formatearPrecio } from '../api/formato';
 import InsigniaReserva from '../components/InsigniaReserva';
 import Alerta from '../components/Alerta';
+import DialogoConfirmacion from '../components/DialogoConfirmacion';
 
 export default function MisReservasPage() {
   const [reservas, setReservas] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [pagandoId, setPagandoId] = useState(null);
+  const [aCancelar, setACancelar] = useState(null);
+  const [cancelando, setCancelando] = useState(false);
   const [errorGeneral, setErrorGeneral] = useState('');
 
     useEffect(() => {
@@ -30,6 +33,21 @@ export default function MisReservasPage() {
       } catch (error) {
         setErrorGeneral(mensajeError(error));
         setPagandoId(null);
+      }
+    }
+
+    async function confirmarCancelacion () {
+      setCancelando(true);
+      setErrorGeneral('');
+      try {
+        const { data } = await cliente.post(`/reservas/${aCancelar.id}/cancelar`);
+        setReservas((actuales) => actuales.map((r) => (r.id === data.id ? data : r)));
+        setACancelar(null);
+      } catch (error) {
+        setErrorGeneral(mensajeError(error));
+        setACancelar(null);
+      } finally {
+        setCancelando(false);
       }
     }
 
@@ -72,10 +90,26 @@ export default function MisReservasPage() {
                     {pagandoId === r.id ? 'Abriendo…' : 'Pagar'}
                   </button>
                 )}
+                {(r.estado === 'PENDIENTE_PAGO' || r.estado === 'CONFIRMADA') && (
+                  <button onClick={() => setACancelar(r)} className="text-sm font-semibold text-red-700 underline">
+                    Cancelar
+                  </button>
+                )}
               </li>
             ))}
           </ul>
         )}
+        <DialogoConfirmacion
+          abierto={aCancelar !== null}
+          titulo="¿Cancelar la reserva?"
+          mensaje={aCancelar?.estado === 'CONFIRMADA'
+            ? 'Tu pago quedará pendiente de reembolso, que gestionará PetCare.'
+            : 'Se liberará el horario para otros clientes.'}
+          textoConfirmar="Sí, cancelar"
+          procesando={cancelando}
+          onConfirmar={confirmarCancelacion}
+          onCancelar={() => setACancelar(null)}
+        />
       </div>
     );
 }
