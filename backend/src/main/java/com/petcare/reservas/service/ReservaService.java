@@ -145,7 +145,7 @@ public class ReservaService {
 
         if (Instant.now().isAfter(limite)) {
             throw new ReglaNegocioException("FUERA_DE_PLAZO_CANCELACION",
-                    "Solo puedes cancelar hasta " + horas + " horas antes del servcio");
+                    "Solo puedes cancelar hasta " + horas + " horas antes del servicio");
         }
 
         boolean habiaPago = reserva.getEstado() == EstadoReserva.CONFIRMADA;
