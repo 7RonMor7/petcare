@@ -90,3 +90,50 @@ construir, no solo reiniciar.
 - **La base de producción arranca vacía**: hay que crear el administrador inicial y revisar que el
   catálogo de V7 se haya cargado.
 - **El adaptador real de Wompi sigue pendiente.** El despliegue lo desbloquea, no lo reemplaza.
+
+---
+
+## Lo que falló de verdad al desplegar
+
+El despliegue salió, pero ninguno de los cinco problemas estaba en el código: todos eran de
+configuración o de infraestructura. Vale la pena dejarlos escritos, porque son los que se repiten.
+
+**1. Railway construyó con Nixpacks en vez del Dockerfile.** Detectó el proyecto Maven por su
+cuenta, compiló con Java 21 y arrancó como root. El `Dockerfile` existía pero nadie lo usaba. Se
+corrige fijando el *Builder* en Dockerfile desde el panel, o declarándolo en `railway.json`.
+Lección: tener el archivo no significa que la plataforma lo esté usando.
+
+**2. `Communications link failure` contra MySQL.** La red privada de Railway es solo IPv6 y la JVM
+prefiere IPv4, así que el backend no resolvía el host interno. Se resolvió apuntando al *TCP proxy*
+público del servicio MySQL. La alternativa era `JAVA_TOOL_OPTIONS=-Djava.net.preferIPv6Addresses=true`.
+
+**3. `Incorrect usage of UPDATE and LIMIT` al crear el administrador.** La consola SQL de Railway
+añade un `LIMIT` a cada sentencia y MySQL no lo admite en un `UPDATE` con `JOIN`. La misma
+actualización escrita con subconsultas, sobre una sola tabla, pasa sin problema. El rol se cambia en
+base de datos porque **ningún endpoint crea administradores**: es una decisión de diseño, no un
+olvido.
+
+**4. La URL de pago salió con una coma dentro.** A `PAGOS_URL_CHECKOUT` se le pusieron las dos URLs
+separadas por coma, copiando el formato de `CORS_ORIGENES`. Pero `origenes-permitidos` se inyecta en
+un `String[]` y Spring lo parte por comas, mientras que `url-checkout` se inyecta en un `String` y se
+concatena tal cual. **Una variable de entorno admite varios valores solo si el tipo destino los
+admite.** Además la URL mala quedó persistida en `orden_pago.url_checkout`, porque `CheckoutService`
+solo pide sesión nueva `if (!orden.tieneCheckoutAbierto())`: arreglar la variable no arregla las
+órdenes ya emitidas.
+
+**5. Vercel devolvía 404 en `/pago-simulado`.** En una SPA las rutas las resuelve React Router en el
+navegador; el servidor solo tiene `index.html`. Vercel buscaba un archivo con ese nombre y respondía
+su propio 404 antes de que React arrancara. Se corrige con `frontend/vercel.json` reenviando
+cualquier ruta a `index.html`. En local no se nota porque el servidor de Vite ya lo hace.
+
+## Qué quedó verificado en producción
+
+Las nueve comprobaciones de la lista pasaron, y sobre la aplicación desplegada se ejecutó el ciclo
+completo: administrador inicial creado, empleado dado de alta con jornada y servicios asignados,
+cliente registrado desde el formulario público, mascota creada, reserva tomada desde el asistente,
+pago por la pasarela simulada y reserva **CONFIRMADA** por el webhook firmado.
+
+La verificación de que la reserva quedó asignada al empleado correcto se hizo por SQL, no por la
+interfaz: el empleado todavía no tiene pantalla donde ver sus reservas. `MiAgendaController` expone
+jornada y bloqueos, nada más. Eso es **HU-025/026** y queda como lo primero del siguiente sprint,
+porque hoy el empleado no puede saber a quién atiende sin mirar la base de datos.
