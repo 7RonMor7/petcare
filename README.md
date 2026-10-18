@@ -264,6 +264,27 @@ prueba con SQL, la conversión hay que hacerla a mano: 09:00 en Bogotá son las 
 
 ---
 
+## Despliegue
+
+| Pieza | Dónde | URL |
+|---|---|---|
+| Frontend | Vercel | https://petcare-mu-one.vercel.app |
+| Backend | Railway (imagen Docker) | https://petcare-production-7.up.railway.app |
+| Base de datos | Railway (MySQL 8) | Privada, accesible por el TCP proxy del servicio |
+
+El backend se construye con el `Dockerfile` de dos etapas que hay en `backend/`: compila con Maven y
+corre sobre un JRE con usuario sin privilegios. El frontend es estático; `frontend/vercel.json`
+reenvía cualquier ruta a `index.html` para que React Router resuelva las rutas en el navegador.
+
+Ninguna credencial vive en el repositorio: las variables de entorno de cada servicio están
+documentadas en `docs/17-guia-hu-005-despliegue.md`, junto con los cinco problemas reales que
+aparecieron al desplegar y cómo se corrigió cada uno.
+
+El administrador inicial no se crea por la aplicación —no existe endpoint para ello—, sino cambiando
+el rol en base de datos después de registrarse como cliente.
+
+---
+
 ## Estado
 
 | Sprint | Contenido | Estado |
@@ -274,7 +295,8 @@ prueba con SQL, la conversión hay que hacerla a mano: 09:00 en Bogotá son las 
 | 3 | Empleados, jornada laboral y servicios por empleado | Completado |
 | 4 | Motor de disponibilidad | Completado |
 | 5 | Creación de reservas y concurrencia | Completado |
-| 6 | Checkout, webhook y ciclo completo de pago | En curso |
+| 6 | Checkout, webhook y ciclo completo de pago | Completado |
+| — | Despliegue en producción (HU-005) | Completado |
 
 Historias cerradas: **HU-007** (registro), **HU-008** (login con JWT), **HU-009** (autorización por
 permisos), **HU-010** (logout con revocación), **HU-016** (registrar mascota), **HU-017** (listar,
@@ -290,6 +312,13 @@ de agenda, RB13) y **HU-038** (elección de empleado o asignación automática).
 Sprints 5 y 6: **HU-032** (crear reserva), **HU-033** (concurrencia garantizada en base de datos),
 **HU-035** (máquina de estados), **HU-039** (orden de pago), **HU-003** y **HU-004** (pasarela y
 puerto con adaptador simulado), **HU-040** (checkout) y **HU-041**/**HU-042** (webhook firmado y
-confirmación de la reserva).
+confirmación de la reserva), **HU-043** (reintento de pago), **HU-044** (expiración automática) y
+**HU-037** (cancelación por el cliente).
+
+Despliegue: **HU-005** — backend, base de datos y frontend en línea, con el ciclo completo de
+reserva y pago verificado sobre la aplicación desplegada.
+
+Pendiente inmediato: **HU-025/026**, la pantalla donde el empleado ve las reservas que debe atender.
+Hoy `MiAgendaController` solo expone jornada y bloqueos.
 
 El análisis, el backlog y las guías de cada historia están en `docs/`.
