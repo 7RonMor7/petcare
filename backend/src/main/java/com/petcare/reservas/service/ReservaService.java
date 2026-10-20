@@ -14,6 +14,7 @@ import com.petcare.pagos.service.OrdenPagoService;
 import com.petcare.reservas.domain.EstadoReserva;
 import com.petcare.reservas.domain.OcupacionFranja;
 import com.petcare.reservas.domain.Reserva;
+import com.petcare.reservas.dto.ReservaAgendaResponse;
 import com.petcare.reservas.dto.ReservaRequest;
 import com.petcare.reservas.dto.ReservaResponse;
 import com.petcare.reservas.repository.OcupacionFranjaRepository;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -165,5 +167,19 @@ public class ReservaService {
 
         ZoneId zona = ZoneId.of(parametros.texto(ParametroService.ZONA_HORARIA, "America/Bogota"));
         return ReservaResponse.desde(reserva, zona);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReservaAgendaResponse> agendaDe(Long empleadoId, LocalDate desde, LocalDate hasta) {
+        ZoneId zona = ZoneId.of(parametros.texto(ParametroService.ZONA_HORARIA, "America/Bogota"));
+        Instant inicio = desde.atStartOfDay(zona).toInstant();
+        Instant fin = hasta.plusDays(1).atStartOfDay(zona).toInstant();
+
+        return reservaRepository
+                .agendaDe(empleadoId, inicio, fin,
+                        List.of(EstadoReserva.CANCELADA, EstadoReserva.EXPIRADA))
+                .stream()
+                .map(r -> ReservaAgendaResponse.desde(r, zona))
+                .toList();
     }
 }
