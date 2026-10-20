@@ -5,6 +5,8 @@ import com.petcare.agenda.dto.BloqueoResponse;
 import com.petcare.agenda.dto.TramoResponse;
 import com.petcare.agenda.service.BloqueoService;
 import com.petcare.agenda.service.JornadaService;
+import com.petcare.reservas.dto.ReservaAgendaResponse;
+import com.petcare.reservas.service.ReservaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -23,6 +25,7 @@ public class MiAgendaController {
 
     private final BloqueoService bloqueoService;
     private final JornadaService jornadaService;
+    private final ReservaService reservaService;
 
     @GetMapping("/jornada")
     @PreAuthorize("hasAuthority('AGENDA_LEER_PROPIA')")
@@ -37,6 +40,15 @@ public class MiAgendaController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
             Authentication auth) {
         return bloqueoService.listar((Long)  auth.getPrincipal(), desde, hasta);
+    }
+
+    @GetMapping("/reservas")
+    @PreAuthorize("hasAuthority('AGENDA_LEER_PROPIA')")
+    public List<ReservaAgendaResponse> misReservas(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
+            Authentication auth) {
+        return reservaService.agendaDe((Long) auth.getPrincipal(), desde, hasta);
     }
 
     @PostMapping("/bloqueos")
