@@ -5,11 +5,14 @@ import { DIAS } from '../components/EditorJornada';
 import CampoTexto from '../components/CampoTexto';
 import Boton from '../components/Boton';
 import Alerta from '../components/Alerta';
+import ListaAgenda from '../components/ListaAgenda';
 
 const VACIO = { fecha: '', horaInicio: '08:00', horaFin: '09:00', motivo: '' };
 
 export default function MiAgendaPage() {
   const [jornada, setJornada] = useState([]);
+  const [reservas, setReservas] = useState([]);
+  const [cargandoReservas, setCargandoReservas] = useState(true);
   const [bloqueos, setBloqueos] = useState([]);
   const [form, setForm] = useState(VACIO);
   const [cargando, setCargando] = useState(true);
@@ -18,6 +21,9 @@ export default function MiAgendaPage() {
 
   const hoy = new Date().toLocaleDateString('sv');
   const dentroDeUnMes = new Date(Date.now() + 30 * 86400000).toLocaleDateString('sv');
+  const enSieteDias = new Date(Date.now() + 7 * 86400000).toLocaleDateString('sv');
+
+  const [rango, setRango] = useState({ desde: hoy, hasta: enSieteDias });
 
   async function cargarBloqueos() {
     const { data } = await cliente.get('/mi-agenda/bloqueos', {
@@ -33,7 +39,19 @@ export default function MiAgendaPage() {
       .finally(() => setCargando(false));
   }, []);
 
+  // Rango propio: la agenda se consulta aparte de la jornada y los bloqueos,
+  // y se vuelve a pedir cada vez que el empleado mueve una de las dos fechas.
+  useEffect(() => {
+    setCargandoReservas(true);
+    cliente
+      .get('/mi-agenda/reservas', { params: rango })
+      .then(({ data }) => setReservas(data))
+      .catch((error) => setErrorGeneral(mensajeError(error)))
+      .finally(() => setCargandoReservas(false));
+  }, [rango.desde, rango.hasta]);
+
   const cambiar = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const cambiarRango = (e) => setRango({ ...rango, [e.target.name]: e.target.value });
 
   async function bloquear(e) {
     e.preventDefault();
@@ -71,6 +89,21 @@ export default function MiAgendaPage() {
       <div className="mt-6"><Alerta>{errorGeneral}</Alerta></div>
 
       <section>
+        <h2 className="mb-3 text-lg font-bold text-neutral-900">Mis reservas</h2>
+
+        <div className="mb-4 grid max-w-md gap-4 sm:grid-cols-2">
+          <CampoTexto etiqueta="Desde" name="desde" tipo="date"
+            value={rango.desde} onChange={cambiarRango} />
+          <CampoTexto etiqueta="Hasta" name="hasta" tipo="date"
+            value={rango.hasta} onChange={cambiarRango} />
+        </div>
+
+        {cargandoReservas
+          ? <p className="text-neutral-600">Cargando reservas…</p>
+          : <ListaAgenda reservas={reservas} />}
+      </section>
+
+      <section className="mt-10">
         <h2 className="mb-3 text-lg font-bold text-neutral-900">Mi jornada</h2>
         {jornada.length === 0 ? (
           <p className="text-neutral-600">No tienes jornada asignada. Habla con administración.</p>
